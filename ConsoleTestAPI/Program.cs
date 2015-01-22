@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DiaryAPI;
-using DiaryAPI.JsonResponseObjects;
+using DiaryAPI.JSONResponseClasses;
 
 namespace ConsoleTestAPI
 {

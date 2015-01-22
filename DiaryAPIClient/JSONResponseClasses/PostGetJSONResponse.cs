@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DiaryAPI.JsonResponseObjects
+namespace DiaryAPI.JSONResponseClasses
 {
     public class PostGetJSONResponse : IErrorChecked
     {
@@ -19,6 +19,17 @@ namespace DiaryAPI.JsonResponseObjects
         public String GetErrorAsString()
         {
             return this.Error;
+        }
+
+        public List<PostUnit> GetPosts()
+        {
+            List<PostUnit> result = new List<PostUnit>();
+            foreach (KeyValuePair<string, PostUnit> kvp in this.Posts)
+            {
+                kvp.Value.Postid = kvp.Value.Postid.Trim();
+                result.Add(kvp.Value);
+            }
+            return result;
         }
     }
 
@@ -48,6 +59,8 @@ namespace DiaryAPI.JsonResponseObjects
         public string Access { get; set; }
         public string Message_src { get; set; }
 
+        public string Url { get { return this.MakeUrl(); } }
+
         public ulong GetNumOfComments()
         {
             try
@@ -58,6 +71,14 @@ namespace DiaryAPI.JsonResponseObjects
             {
                 return Convert.ToUInt64(0);
             }
+        }
+
+        public string MakeUrl()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("http://").Append(this.Author_shortname)
+                .Append(".diary.ru/p").Append(this.Postid).Append(".htm");
+            return sb.ToString();
         }
     }
 }

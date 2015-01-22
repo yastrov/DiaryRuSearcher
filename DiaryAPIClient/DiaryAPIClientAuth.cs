@@ -1,4 +1,4 @@
-﻿using DiaryAPI.JsonResponseObjects;
+﻿using DiaryAPI.JSONResponseClasses;
 using System;
 using System.Collections.Specialized;
 using System.Net;
@@ -12,6 +12,21 @@ namespace DiaryAPI
         {
             NameValueCollection nvc = new NameValueCollection();
             //nvc.Add("username", Convert(username));
+            nvc.Add("username", username);
+            nvc.Add("password", MakeDiaryPassword(password));
+            nvc.Add("method", "user.auth");
+            nvc.Add("appkey", appkey);
+            string postString = NameValueCollectionToParamString(nvc);
+            using (HttpWebResponse response = this._Request("POST", ConvertToWinByte(postString)))
+            {
+                var r = GetObjectFromJson<AuthJSONResponse>(response);
+                if (r.CheckForError()) throw new DiaryAPIClientException(r.Error);
+                _sid = r.Sid;
+            }
+        }
+        public void AuthSecure(string username, System.Security.SecureString password)
+        {
+            NameValueCollection nvc = new NameValueCollection();
             nvc.Add("username", username);
             nvc.Add("password", MakeDiaryPassword(password));
             nvc.Add("method", "user.auth");

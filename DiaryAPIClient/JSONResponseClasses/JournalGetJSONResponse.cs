@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DiaryAPI.JsonResponseObjects
+namespace DiaryAPI.JSONResponseClasses
 {
     public class JournalGetJSONResponse : IErrorChecked
     {
@@ -24,18 +24,18 @@ namespace DiaryAPI.JsonResponseObjects
 
     public class JournalUnit
     {
-        public string userid { get; set; }
-        public string ctime { get; set; }
-        public string shortname { get; set; }
-        public string title { get; set; }
-        public string count_pch { get; set; }
-        public string access { get; set; }
-        public string tags { get; set; }
-        public string posts { get; set; }
-        public string can_write { get; set; }
-        public string count_members { get; set; }
-        public string last_post_id { get; set; }
-        public string last_post { get; set; }
-        public string jtype { get; set; }
+        public string Userid { get; set; }
+        public string Ctime { get; set; }
+        public string Shortname { get; set; }
+        public string Title { get; set; }
+        public string Count_pch { get; set; }
+        public string Access { get; set; }
+        public string Tags { get; set; }
+        public ulong Posts { get; set; }
+        public string Can_write { get; set; }
+        public string Count_members { get; set; }
+        public string Last_post_id { get; set; }
+        public string Last_post { get; set; }
+        public string Jtype { get; set; }
     }
 }

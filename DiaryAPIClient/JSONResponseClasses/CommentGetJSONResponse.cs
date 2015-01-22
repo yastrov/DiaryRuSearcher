@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DiaryAPI.JsonResponseObjects
+namespace DiaryAPI.JSONResponseClasses
 {
     public class CommentGetJSONResponse : IErrorChecked
     {
@@ -19,6 +19,17 @@ namespace DiaryAPI.JsonResponseObjects
         public String GetErrorAsString()
         {
             return this.Error;
+        }
+
+        public List<CommentUnit> GetComments(string postid)
+        {
+            List<CommentUnit> result = new List<CommentUnit>();
+            foreach (KeyValuePair<string, CommentUnit> kvp in this.Comments)
+            {
+                kvp.Value.Postid = postid;
+                result.Add(kvp.Value);
+            }
+            return result;
         }
     }
 
@@ -37,9 +48,18 @@ namespace DiaryAPI.JsonResponseObjects
         public string Can_delete { get; set; }
         public string Author_jtype { get; set; }
 
-        public string PostId { get; set; }
+        public string Postid { get; set; }
 
-        
+        public string Url { get { return this.MakeUrl(); } }
+
+        public string MakeUrl()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("http://").Append(this.Author_shortname)
+            .Append(".diary.ru/p").Append(this.Postid)
+            .Append(".htm#").Append(this.Commentid);
+            return sb.ToString();
+        }
     }
 
 }

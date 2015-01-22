@@ -1,4 +1,4 @@
-﻿using DiaryAPI.JsonResponseObjects;
+﻿using DiaryAPI.JSONResponseClasses;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

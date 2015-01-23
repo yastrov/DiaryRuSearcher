@@ -31,7 +31,7 @@ namespace DiaryAPI.JSONResponseClasses
         public string Count_pch { get; set; }
         public string Access { get; set; }
         public string Tags { get; set; }
-        public ulong Posts { get; set; }
+        public Int64 Posts { get; set; }
         public string Can_write { get; set; }
         public string Count_members { get; set; }
         public string Last_post_id { get; set; }

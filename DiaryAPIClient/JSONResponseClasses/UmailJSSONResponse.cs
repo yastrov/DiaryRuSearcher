@@ -10,7 +10,7 @@ namespace DiaryAPI.JSONResponseClasses
     {
         public string Result { get; set; }
         public Dictionary<string, UmailUnit> Umail { get; set; }
-        public ulong Count { get; set; }
+        public Int64 Count { get; set; }
         public string Error { get; set; }
 
         public Boolean CheckForError()
@@ -40,6 +40,7 @@ namespace DiaryAPI.JSONResponseClasses
         public string Read { get; set; }
         public string Dateline { get; set; }
         public string Title { get; set; }
+        [SQLite.PrimaryKey]
         public string Umailid { get; set; }
         public string From_userid { get; set; }
         public string No_smilies { get; set; }
@@ -49,8 +50,8 @@ namespace DiaryAPI.JSONResponseClasses
     public class UmailFoldersJSONResponse : IErrorChecked
     {
         public string Result { get; set; }
-        public Dictionary<string, UmailFolderlUnit> Folders2 { get; set; }
-        public ulong Count { get; set; }
+        public Dictionary<string, UmailFolderUnit> Folders2 { get; set; }
+        public int Count { get; set; }
         public string Error { get; set; }
 
         public Boolean CheckForError()
@@ -62,10 +63,10 @@ namespace DiaryAPI.JSONResponseClasses
             return this.Error;
         }
 
-        public List<UmailFolderlUnit> GetFolders()
+        public List<UmailFolderUnit> GetFolders()
         {
-            List<UmailFolderlUnit> result = new List<UmailFolderlUnit>();
-            foreach (KeyValuePair<string, UmailFolderlUnit> kvp in this.Folders2)
+            List<UmailFolderUnit> result = new List<UmailFolderUnit>();
+            foreach (KeyValuePair<string, UmailFolderUnit> kvp in this.Folders2)
             {
                 kvp.Value.Folderid = kvp.Key;
                 result.Add(kvp.Value);
@@ -74,10 +75,11 @@ namespace DiaryAPI.JSONResponseClasses
         }
     }
 
-    public class UmailFolderlUnit
+    public class UmailFolderUnit
     {
         public string Name { get; set; }
-        public ulong Count { get; set; }
+        public int Count { get; set; }
+        [SQLite.PrimaryKey]
         public string Folderid { get; set; }
     }
 }

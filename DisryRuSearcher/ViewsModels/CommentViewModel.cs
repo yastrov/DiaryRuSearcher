@@ -4,43 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DiaryAPI.JSONResponseClasses
+namespace DiaryRuSearcher.ViewsModels
 {
-    public class CommentGetJSONResponse : IErrorChecked
-    {
-        public Dictionary<string, CommentUnit> Comments { get; set; }
-        public string Result { get; set; }
-        public string Error { get; set; }
-
-        public Boolean CheckForError()
-        {
-            return !String.IsNullOrEmpty(this.Error);
-        }
-        public String GetErrorAsString()
-        {
-            return this.Error;
-        }
-
-        public List<CommentUnit> GetComments(string postid)
-        {
-            List<CommentUnit> result = new List<CommentUnit>();
-            foreach (KeyValuePair<string, CommentUnit> kvp in this.Comments)
-            {
-                kvp.Value.Postid = postid;
-                result.Add(kvp.Value);
-            }
-            return result;
-        }
-    }
-
-    public class CommentUnit
+    class CommentViewModel
     {
         public string Can_edit { get; set; }
         public string Author_title { get; set; }
         public string Author_shortname { get; set; }
         public string Author_avatar { get; set; }
         public string Author_username { get; set; }
-        [SQLite.PrimaryKey]
         public string Commentid { get; set; }
         public string Dateline { get; set; }
         public string Author_userid { get; set; }
@@ -61,6 +33,21 @@ namespace DiaryAPI.JSONResponseClasses
             .Append(".htm#").Append(this.Commentid);
             return sb.ToString();
         }
-    }
 
+        public CommentViewModel(DiaryAPI.JSONResponseClasses.CommentUnit comment)
+        {
+            this.Author_avatar = comment.Author_avatar;
+            this.Author_jtype = comment.Author_jtype;
+            this.Author_shortname = comment.Author_shortname;
+            this.Author_title = comment.Author_title;
+            this.Author_userid = comment.Author_userid;
+            this.Author_username = comment.Author_username;
+            this.Can_delete = comment.Can_delete;
+            this.Can_edit = comment.Can_edit;
+            this.Commentid = comment.Commentid;
+            this.Dateline = comment.Dateline;
+            this.Message_html = comment.Message_html;
+            this.Postid = comment.Postid;
+        }
+    }
 }

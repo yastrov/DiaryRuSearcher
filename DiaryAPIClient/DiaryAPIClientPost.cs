@@ -15,7 +15,7 @@ namespace DiaryAPI
 {
     public partial class DiaryAPIClient
     {
-        public List<PostUnit> PostGet(string diarytype, string shortname, ulong from)
+        public List<PostUnit> PostGet(string diarytype, string shortname, Int64 from)
         {
             List<PostUnit> result;
             NameValueCollection nvc = new NameValueCollection();
@@ -38,15 +38,16 @@ namespace DiaryAPI
         public List<PostUnit> AllPostsGet(string diarytype, JournalUnit journal)
         {
             List<PostUnit> result = new List<PostUnit>();
-                ulong post_count = journal.Posts;
-                ulong i = 0;
+                Int64 post_count = journal.Posts;
+                Int64 i = 0;
                 List<PostUnit> r;
                 while (i < post_count)
                 {
                     r = PostGet(diarytype, journal.Shortname, i);
                     result.AddRange(r);
                     System.Threading.Thread.Sleep(1000);
-                    i += Convert.ToUInt64(r.Count());
+                    i += Convert.ToInt64(r.Count());
+                    //i += r.Count();
                 }
             return result;
         }
@@ -55,8 +56,8 @@ namespace DiaryAPI
         public void AllPostsGetProcessing(string diarytype, JournalUnit journal, IPostCommentsProcessor processor)
         {
 
-                ulong post_count = journal.Posts;
-                ulong i = 0;
+                Int64 post_count = journal.Posts;
+                int i = 0;
                 List<PostUnit> r;
                 while (i < post_count)
                 {
@@ -67,7 +68,8 @@ namespace DiaryAPI
                         System.Threading.Thread.Sleep(1000);
                         AllCommentsGetForPostProcessing(post, processor);
                     System.Threading.Thread.Sleep(1000);
-                    i += Convert.ToUInt64(r.Count());
+                    //i += Convert.ToUInt64(r.Count());
+                    i += r.Count();
                     }
                 }
         }
@@ -75,7 +77,7 @@ namespace DiaryAPI
 
         #region Async
 
-        public async Task<List<PostUnit>> PostGetAsync(string diarytype, string shortname, ulong from)
+        public async Task<List<PostUnit>> PostGetAsync(string diarytype, string shortname, Int64 from)
         {
             List<PostUnit> result;
             NameValueCollection nvc = new NameValueCollection();
@@ -94,10 +96,10 @@ namespace DiaryAPI
             }
             return result;
         }
-        public async Task AllPostsGetProcessingAsync(string diarytype, JournalUnit journal, IPostCommentsProcessor processor, IProgress<ulong> onProgressPercentChanged, CancellationToken cancellationToken)
+        public async Task AllPostsGetProcessingAsync(string diarytype, JournalUnit journal, IPostCommentsProcessor processor, IProgress<Int64> onProgressPercentChanged, CancellationToken cancellationToken)
         {
-            ulong post_count = journal.Posts;
-            ulong i = 0;
+            Int64 post_count = journal.Posts;
+            Int64 i = 0;
             List<PostUnit> r;
             while (i < post_count)
             {
@@ -110,7 +112,8 @@ namespace DiaryAPI
                     
                 }
                 System.Threading.Thread.Sleep(1000);
-                i += Convert.ToUInt64(r.Count());
+                i += Convert.ToInt64(r.Count());
+                //i += r.Count();
                 onProgressPercentChanged.Report(i / post_count);
             }
         }

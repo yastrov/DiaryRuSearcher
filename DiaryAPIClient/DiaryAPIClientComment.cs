@@ -12,7 +12,7 @@ namespace DiaryAPI
 {
     public partial class DiaryAPIClient
     {
-        public List<CommentUnit> CommentGet(string postid, ulong from)
+        public List<CommentUnit> CommentGet(string postid, int from)
         {
             List<CommentUnit> result;
             NameValueCollection nvc = new NameValueCollection();
@@ -63,7 +63,7 @@ namespace DiaryAPI
 
         #region Async
 
-        public async Task<List<CommentUnit>> CommentGetAsync(string postid, ulong from)
+        public async Task<List<CommentUnit>> CommentGetAsync(string postid, int from)
         {
             List<CommentUnit> result;
             NameValueCollection nvc = new NameValueCollection();

@@ -20,7 +20,9 @@ namespace DiaryAPI
 
             nvc.Add("method", "journal.get");
             nvc.Add("sid", _sid);
+            if(!String.IsNullOrEmpty(shortname))
             nvc.Add("shortname", shortname);
+            if (!String.IsNullOrEmpty(userid))
             nvc.Add("userid", userid);
             string postString = string.Join("&", nvc.AllKeys.Where(_key =>
                 !string.IsNullOrWhiteSpace(nvc[_key]))

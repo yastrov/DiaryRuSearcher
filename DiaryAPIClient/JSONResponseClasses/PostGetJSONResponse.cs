@@ -42,11 +42,13 @@ namespace DiaryAPI.JSONResponseClasses
         public string Comments_count_data { get; set; }
         public string Author_userid { get; set; }
         public string Subscribed { get; set; }
+        [SQLite.Ignore]
         public Dictionary<String, String> Tags_data { get; set; }
         public string Can_edit { get; set; }
         public string Author_shortname { get; set; }
         public string Avatarid { get; set; }
         public string No_smile { get; set; }
+        [SQLite.PrimaryKey]
         public string Postid { get; set; }
         public string Jaccess { get; set; }
         public string Juserid { get; set; }
@@ -61,15 +63,16 @@ namespace DiaryAPI.JSONResponseClasses
 
         public string Url { get { return this.MakeUrl(); } }
 
-        public ulong GetNumOfComments()
+        public int GetNumOfComments()
         {
             try
             {
-                return ulong.Parse(Comments_count_data);
+                return int.Parse(Comments_count_data);
+                //return ulong.Parse(Comments_count_data);
             }
             catch (Exception e)
             {
-                return Convert.ToUInt64(0);
+                return 0;// return Convert.ToUInt64(0);
             }
         }
 

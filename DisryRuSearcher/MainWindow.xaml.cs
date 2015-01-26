@@ -28,7 +28,7 @@ namespace DiaryRuSearcher
         private CancellationTokenSource cancelSource;
         private DiaryAPI.DiaryAPIClient diaryAPIClient = new DiaryAPIClient();
 
-        private ObservableCollection<PostViewModel> postsCollection = null;
+        private static ObservableCollection<PostViewModel> postsCollection = null;
         private ObservableCollection<CommentViewModel> commentsCollection = null;
         private ObservableCollection<UmailViewModel> umailsCollection = null;
         private ObservableCollection<UmailFolderViewModel> umailFoldersCollection = null;
@@ -66,6 +66,26 @@ namespace DiaryRuSearcher
         private void saverButton_Click(object sender, RoutedEventArgs e)
         {
             cancelSource.Cancel();
+        }
+
+        private void Show_Click(object sender, RoutedEventArgs e)
+        {
+            postsCollection = new DiaryDataBase().GetPosts();
+            postsListView.ItemsSource = postsCollection;
+            postsListView.ItemsSource = postsCollection;
+            //postsListView.Items.CurrentItem
+            myDataGrid.ItemsSource = postsCollection;
+        }
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(e.Uri.AbsoluteUri);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Diary Ru Searcher", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
     }
 }

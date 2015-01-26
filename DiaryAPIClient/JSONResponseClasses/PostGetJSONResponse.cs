@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -42,8 +43,8 @@ namespace DiaryAPI.JSONResponseClasses
         public string Comments_count_data { get; set; }
         public string Author_userid { get; set; }
         public string Subscribed { get; set; }
-        [SQLite.Ignore]
-        public Dictionary<String, String> Tags_data { get; set; }
+        //[SQLite.Ignore]
+        //public Dictionary<String, String> Tags_data { get; set; }
         public string Can_edit { get; set; }
         public string Author_shortname { get; set; }
         public string Avatarid { get; set; }

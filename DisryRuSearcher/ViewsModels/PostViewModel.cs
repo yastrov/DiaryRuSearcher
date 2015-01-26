@@ -15,8 +15,8 @@ namespace DiaryRuSearcher.ViewsModels
         public string Comments_count_data { get; set; }
         public string Author_userid { get; set; }
         public string Subscribed { get; set; }
-        [SQLite.Ignore]
-        public Dictionary<String, String> Tags_data { get; set; }
+        //[SQLite.Ignore]
+        //public Dictionary<String, String> Tags_data { get; set; }
         public string Can_edit { get; set; }
         public string Author_shortname { get; set; }
         public string Avatarid { get; set; }
@@ -79,7 +79,7 @@ namespace DiaryRuSearcher.ViewsModels
             this.Postid = post.Postid;
             this.Shortname = post.Shortname;
             this.Subscribed = post.Subscribed;
-            this.Tags_data = post.Tags_data;
+            //this.Tags_data = post.Tags_data;
             this.Title = post.Title;
         }
 
@@ -107,7 +107,7 @@ namespace DiaryRuSearcher.ViewsModels
             post.Postid = view.Postid;
             post.Shortname = view.Shortname;
             post.Subscribed = view.Subscribed;
-            post.Tags_data = view.Tags_data;
+            //post.Tags_data = view.Tags_data;
             post.Title = view.Title;
             return post;
         }

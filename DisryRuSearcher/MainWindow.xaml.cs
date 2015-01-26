@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using DiaryAPI;
 using System.Collections.ObjectModel;
 using DiaryRuSearcher.ViewsModels;
+using DiaryAPI.JSONResponseClasses;
 
 namespace DiaryRuSearcher
 {
@@ -37,30 +38,10 @@ namespace DiaryRuSearcher
             InitializeComponent();
         }
 
+        #region Button clicks
         async private void goButton_Click(object sender, RoutedEventArgs e)
         {
-
-            try
-            {
-                await diaryAPIClient.AuthSecureAsync(loginBox.Text, passwordBox.SecurePassword);
-                progress = new Progress<Int64>(i => progressBar.Value = i);
-                cancelSource = new CancellationTokenSource();
-                try
-                {
-                    DiarySaverDB saver = new DiarySaverDB();
-                    var journal = diaryAPIClient.JournalGet("", "");
-                    //In theoretical, you may pass "await" keyword and see the result:
-                    await diaryAPIClient.AllPostsGetProcessingAsync("diarytype", journal, saver, progress, cancelSource.Token);
-                }
-                catch (OperationCanceledException ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
-            }
-            catch(DiaryAPIClientException ex)
-            {
-                MessageBox.Show(e.ToString());
-            }
+            await Auth();
         }
 
         private void saverButton_Click(object sender, RoutedEventArgs e)
@@ -70,12 +51,110 @@ namespace DiaryRuSearcher
 
         private void Show_Click(object sender, RoutedEventArgs e)
         {
-            postsCollection = new DiaryDataBase().GetPosts();
-            postsListView.ItemsSource = postsCollection;
-            postsListView.ItemsSource = postsCollection;
-            //postsListView.Items.CurrentItem
-            myDataGrid.ItemsSource = postsCollection;
+            ;
         }
+        private void commentsSearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            string commentAuthor = commentAuthorTextBox.Text.Trim();
+            string commentKeyWord = commentsKeywordTextBox.Text.Trim();
+            commentsCollection = new DiaryDataBase().GetCommentsByAuthorKeyword(commentAuthor, commentKeyWord);
+            commentsListView.ItemsSource = commentsCollection;
+        }
+        private void umailSearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            string umailSender= umailSenderNameTextBox.Text.Trim();
+            string umailReceiver = umailReciverNameTextBox.Text.Trim();
+            string umailKeyword = umailKeywordTextBox.Text.Trim();
+            umailsCollection = new DiaryDataBase().GetUmailsBySenderReceiverKeyword(umailSender, umailReceiver, umailKeyword);
+            umailFoldersListView.ItemsSource = umailsCollection;
+        }
+        #endregion
+
+        #region for DiaryAPI
+        async Task Auth()
+        {
+            try
+            {
+                await diaryAPIClient.AuthSecureAsync(loginBox.Text.Trim(), passwordBox.SecurePassword);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        async private void downloadPostsAndComments(string shortname, bool withComments)
+        {
+            try
+            {
+                progress = new Progress<Int64>(i => progressBar.Value = i);
+                cancelSource = new CancellationTokenSource();
+                try
+                {
+                    DiarySaverDB saver = new DiarySaverDB();
+                    var journal = diaryAPIClient.JournalGet("", shortname);
+                    //In theoretical, you may pass "await" keyword and see the result:
+                    await diaryAPIClient.AllPostsGetProcessingAsync("diarytype", journal, withComments, saver, progress, cancelSource.Token);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+            catch (DiaryAPIClientException ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        async private void downloadUmailFolders()
+        {
+            try
+            {
+                progress = new Progress<Int64>(i => progressBar.Value = i);
+                cancelSource = new CancellationTokenSource();
+                try
+                {
+                    List<UmailFolderUnit> folders = await diaryAPIClient.UmailGetFoldersAsync();
+                    DiarySaverDB saver = new DiarySaverDB();
+                    foreach (var folder in folders)
+                    {
+                        saver.InsertUmailFolder(folder);
+                    }
+                    TabControlUmailSearch_SelectionChanged();
+                }
+                catch (OperationCanceledException ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+            catch (DiaryAPIClientException ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        async private void downloadUmails()
+        {
+            try
+            {
+                progress = new Progress<Int64>(i => progressBar.Value = i);
+                cancelSource = new CancellationTokenSource();
+                try
+                {
+                    DiarySaverDB saver = new DiarySaverDB();
+                    await diaryAPIClient.AllUmailsGetInAllFoldersProcessingAsync(saver, progress, cancelSource.Token);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+            catch (DiaryAPIClientException ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        #endregion
+
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
             try
@@ -86,6 +165,12 @@ namespace DiaryRuSearcher
             {
                 System.Windows.MessageBox.Show(ex.Message, "Diary Ru Searcher", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+        
+
+        private void umailSearchButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

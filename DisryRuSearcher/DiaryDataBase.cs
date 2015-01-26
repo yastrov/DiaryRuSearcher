@@ -12,7 +12,7 @@ namespace DiaryRuSearcher
 {
     class DiaryDataBase
     {
-        private string DBPath = Path.Combine(
+        protected string DBPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             "DiarySearchDB.sqlt");
         public DiaryDataBase()
@@ -75,7 +75,7 @@ namespace DiaryRuSearcher
                 try
                 {
                     var existingPost = db.Table<PostUnit>().Where(
-                        p => p.Postid.Equals(post.Postid) ).SingleOrDefault();
+                        p => p.Postid.Equals(post.Postid)).SingleOrDefault();
 
                     if (existingPost != null)
                     {
@@ -199,6 +199,38 @@ namespace DiaryRuSearcher
                 }
             }
             return folders;
+        }
+        #endregion
+
+        #region Search by...
+        public ObservableCollection<CommentViewModel> GetCommentsByAuthorKeyword(string commentAuthor, string commentKeyWord)
+        {
+            var result = new ObservableCollection<CommentViewModel>();
+            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            {
+                var query = db.Table<CommentUnit>().Where(c => c.Author_username.Equals(commentAuthor) || c.Message_html.Contains(commentKeyWord)).OrderBy(c => c.Dateline);
+                foreach (var _c in query)
+                {
+                    var unit = new CommentViewModel(_c);
+                    result.Add(unit);
+                }
+            }
+            return result;
+        }
+
+        public ObservableCollection<UmailViewModel> GetUmailsBySenderReceiverKeyword(string umailSender, string umailReceiver, string umailKeyword)
+        {
+            var result = new ObservableCollection<UmailViewModel>();
+            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            {
+                var query = db.Table<UmailUnit>().Where(c => c.From_username.Equals(umailSender) || c.From_username.Equals(umailReceiver) || c.Message_html.Contains(umailKeyword)).OrderBy(c => c.Dateline);
+                foreach (var _c in query)
+                {
+                    var unit = new UmailViewModel(_c);
+                    result.Add(unit);
+                }
+            }
+            return result;
         }
         #endregion
     }

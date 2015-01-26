@@ -51,7 +51,7 @@ namespace DiaryAPI.JSONResponseClasses
     {
         public string Result { get; set; }
         public Dictionary<string, UmailFolderUnit> Folders2 { get; set; }
-        public int Count { get; set; }
+        public Int64 Count { get; set; }
         public string Error { get; set; }
 
         public Boolean CheckForError()
@@ -78,7 +78,7 @@ namespace DiaryAPI.JSONResponseClasses
     public class UmailFolderUnit
     {
         public string Name { get; set; }
-        public int Count { get; set; }
+        public Int64 Count { get; set; }
         [SQLite.PrimaryKey]
         public string Folderid { get; set; }
     }

@@ -158,7 +158,9 @@ namespace DiaryAPI
             return result;
         }
 
-        public async Task AllUmailsGetInFolderProcessingAsync(UmailFolderUnit folderUnit, IUmailProcessor processor, CancellationToken cancellationToken)
+        public async Task AllUmailsGetInFolderProcessingAsync(UmailFolderUnit folderUnit,
+                                                            IUmailProcessor processor,
+                                                            CancellationToken cancellationToken)
         {
             int i = 0;
             List<UmailUnit> r;
@@ -173,10 +175,12 @@ namespace DiaryAPI
                 i += r.Count();
             }
         }
-        public async Task AllUmailsGetInAllFoldersProcessingAsync(IUmailProcessor processor, IProgress<int> onProgressPercentChanged,CancellationToken cancellationToken)
+        public async Task AllUmailsGetInAllFoldersProcessingAsync(IUmailProcessor processor,
+                                                       IProgress<Int64> onProgressPercentChanged,
+                                                        CancellationToken cancellationToken)
         {
             var r = UmailGetFolders();
-            int all_mails = 0, current = 0;
+            Int64 all_mails = 0, current = 0;
             foreach (var f in r)
                 all_mails += f.Count;
             foreach (var folder in r)

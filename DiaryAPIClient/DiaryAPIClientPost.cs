@@ -24,7 +24,7 @@ namespace DiaryAPI
             nvc.Add("shortname", shortname);
             nvc.Add("type", diarytype);
             if (from != 0)
-            nvc.Add("from", from.ToString());
+                nvc.Add("from", from.ToString());
             string postString = NameValueCollectionToUrlString(nvc);
             using (HttpWebResponse response = this._Request(postString, "GET", null))
             {
@@ -38,17 +38,17 @@ namespace DiaryAPI
         public List<PostUnit> AllPostsGet(string diarytype, JournalUnit journal)
         {
             List<PostUnit> result = new List<PostUnit>();
-                Int64 post_count = journal.Posts;
-                Int64 i = 0;
-                List<PostUnit> r;
-                while (i < post_count)
-                {
-                    r = PostGet(diarytype, journal.Shortname, i);
-                    result.AddRange(r);
-                    System.Threading.Thread.Sleep(1000);
-                    i += Convert.ToInt64(r.Count());
-                    //i += r.Count();
-                }
+            Int64 post_count = journal.Posts;
+            Int64 i = 0;
+            List<PostUnit> r;
+            while (i < post_count)
+            {
+                r = PostGet(diarytype, journal.Shortname, i);
+                result.AddRange(r);
+                System.Threading.Thread.Sleep(1000);
+                i += Convert.ToInt64(r.Count());
+                //i += r.Count();
+            }
             return result;
         }
 
@@ -56,22 +56,22 @@ namespace DiaryAPI
         public void AllPostsGetProcessing(string diarytype, JournalUnit journal, IPostCommentsProcessor processor)
         {
 
-                Int64 post_count = journal.Posts;
-                int i = 0;
-                List<PostUnit> r;
-                while (i < post_count)
+            Int64 post_count = journal.Posts;
+            int i = 0;
+            List<PostUnit> r;
+            while (i < post_count)
+            {
+                r = PostGet(diarytype, journal.Shortname, i);
+                foreach (var post in r)
                 {
-                    r = PostGet(diarytype, journal.Shortname, i);
-                    foreach(var post in r)
-                    {
-                        processor.ProcessPost(post);
-                        System.Threading.Thread.Sleep(1000);
-                        AllCommentsGetForPostProcessing(post, processor);
+                    processor.ProcessPost(post);
+                    System.Threading.Thread.Sleep(1000);
+                    AllCommentsGetForPostProcessing(post, processor);
                     System.Threading.Thread.Sleep(1000);
                     //i += Convert.ToUInt64(r.Count());
                     i += r.Count();
-                    }
                 }
+            }
         }
         #endregion
 
@@ -96,7 +96,12 @@ namespace DiaryAPI
             }
             return result;
         }
-        public async Task AllPostsGetProcessingAsync(string diarytype, JournalUnit journal, IPostCommentsProcessor processor, IProgress<Int64> onProgressPercentChanged, CancellationToken cancellationToken)
+        public async Task AllPostsGetProcessingAsync(string diarytype,
+                                                JournalUnit journal,
+                                                bool withComments,
+                                                IPostCommentsProcessor processor,
+                                                IProgress<Int64> onProgressPercentChanged,
+                                                CancellationToken cancellationToken)
         {
             Int64 post_count = journal.Posts;
             Int64 i = 0;
@@ -106,10 +111,11 @@ namespace DiaryAPI
                 r = await PostGetAsync(diarytype, journal.Shortname, i);
                 foreach (var post in r)
                 {
-                    await Task.Run(() => {processor.ProcessPost(post);});
+                    await Task.Run(() => { processor.ProcessPost(post); });
                     System.Threading.Thread.Sleep(1000);
-                    await AllCommentsGetForPostProcessingAsync(post, processor);
-                    
+                    if (withComments)
+                        await AllCommentsGetForPostProcessingAsync(post, processor);
+
                 }
                 System.Threading.Thread.Sleep(1000);
                 i += Convert.ToInt64(r.Count());

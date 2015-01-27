@@ -67,9 +67,9 @@ namespace DiaryRuSearcher
         }
 
         #region Button clicks
-        private void goButton_Click(object sender, RoutedEventArgs e)
+        async private void goButton_Click(object sender, RoutedEventArgs e)
         {
-            processGoButtonClick().Start();
+            await processGoButtonClick();
         }
         async private Task processGoButtonClick()
         {
@@ -94,7 +94,11 @@ namespace DiaryRuSearcher
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                System.Windows.MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                System.Windows.MessageBox.Show("Загрузка данных завершена!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
         private void saverButton_Click(object sender, RoutedEventArgs e)

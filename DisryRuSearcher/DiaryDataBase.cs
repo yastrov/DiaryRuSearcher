@@ -121,7 +121,7 @@ namespace DiaryRuSearcher
             var comments = new ObservableCollection<CommentViewModel>();
             using (var db = new SQLite.SQLiteConnection(this.DBPath))
             {
-                var query = db.Table<CommentUnit>().OrderBy(c => c.Commentid);
+                var query = db.Table<CommentUnit>().OrderByDescending(c => c.Commentid);
                 foreach (var _comment in query)
                 {
                     var unit = new CommentViewModel(_comment);
@@ -156,7 +156,7 @@ namespace DiaryRuSearcher
             var comments = new ObservableCollection<UmailViewModel>();
             using (var db = new SQLite.SQLiteConnection(this.DBPath))
             {
-                var query = db.Table<UmailUnit>().OrderBy(c => c.Umailid);
+                var query = db.Table<UmailUnit>().OrderByDescending(c => c.Umailid);
                 foreach (var _comment in query)
                 {
                     var unit = new UmailViewModel(_comment);
@@ -192,7 +192,7 @@ namespace DiaryRuSearcher
             var folders = new ObservableCollection<UmailFolderViewModel>();
             using (var db = new SQLite.SQLiteConnection(this.DBPath))
             {
-                var query = db.Table<UmailFolderUnit>().OrderBy(c => c.Folderid);
+                var query = db.Table<UmailFolderUnit>().OrderByDescending(c => c.Folderid);
                 foreach (var _folder in query)
                 {
                     var unit = new UmailFolderViewModel(_folder);
@@ -211,7 +211,7 @@ namespace DiaryRuSearcher
             {
                 if (!string.IsNullOrEmpty(commentAuthor))
                 {
-                    var query = db.Table<CommentUnit>().Where(c => c.Author_username.Equals(commentAuthor)).OrderBy(c => c.Dateline);
+                    var query = db.Table<CommentUnit>().Where(c => c.Author_username.Equals(commentAuthor)).OrderByDescending(c => c.Dateline);
                     foreach (var _c in query)
                     {
                         var unit = new CommentViewModel(_c);
@@ -221,7 +221,7 @@ namespace DiaryRuSearcher
                 if (!string.IsNullOrEmpty(commentKeyWord))
                 {
                     Regex regex = new Regex(commentKeyWord);
-                    var query = db.Table<CommentUnit>().Where(c => regex.IsMatch(c.Message_html)).OrderBy(c => c.Dateline);
+                    var query = db.Table<CommentUnit>().AsEnumerable().Where(c => regex.IsMatch(c.Message_html)).OrderByDescending(c => c.Dateline);
                     foreach (var _c in query)
                     {
                         var unit = new CommentViewModel(_c);
@@ -239,7 +239,7 @@ namespace DiaryRuSearcher
             {
                 if (!string.IsNullOrEmpty(umailSender))
                 {
-                    var query = db.Table<UmailUnit>().Where(c => c.From_username.Equals(umailSender)).OrderBy(c => c.Dateline);
+                    var query = db.Table<UmailUnit>().Where(c => c.From_username.Equals(umailSender)).OrderByDescending(c => c.Dateline);
                     foreach (var _c in query)
                     {
                         var unit = new UmailViewModel(_c);
@@ -248,7 +248,7 @@ namespace DiaryRuSearcher
                 }
                 if (!string.IsNullOrEmpty(title))
                 {
-                    var query = db.Table<UmailUnit>().Where(c => c.Title.Contains(title)).OrderBy(c => c.Dateline).OrderBy(C => C.Dateline);
+                    var query = db.Table<UmailUnit>().Where(c => c.Title.Contains(title)).OrderBy(c => c.Dateline).OrderByDescending(C => C.Dateline);
                     foreach (var _c in query)
                     {
                         var unit = new UmailViewModel(_c);
@@ -258,7 +258,7 @@ namespace DiaryRuSearcher
                 if (!string.IsNullOrEmpty(umailKeyword))
                 {
                     Regex regexp = new Regex(umailKeyword);
-                    var query = db.Table<UmailUnit>().AsEnumerable().Where(c => regexp.IsMatch(c.Message_html)).OrderBy(C=> C.Dateline);
+                    var query = db.Table<UmailUnit>().AsEnumerable().Where(c => regexp.IsMatch(c.Message_html)).OrderByDescending(C => C.Dateline);
                     foreach (var _c in query)
                     {
                         var unit = new UmailViewModel(_c);
@@ -277,7 +277,7 @@ namespace DiaryRuSearcher
             {
                 if (!string.IsNullOrEmpty(postAuthor))
                 {
-                    var query = db.Table<PostUnit>().Where(c => c.Author_username.Equals(postAuthor)).OrderBy(c => c.Dateline_date);
+                    var query = db.Table<PostUnit>().Where(c => c.Author_username.Equals(postAuthor)).OrderByDescending(c => c.Dateline_date);
                     foreach (var _c in query)
                     {
                         var unit = new PostViewModel(_c);
@@ -286,7 +286,7 @@ namespace DiaryRuSearcher
                 }
                 if (!string.IsNullOrEmpty(postTitle))
                 {
-                    var query = db.Table<PostUnit>().Where(c => c.Title.Contains(postTitle)).OrderBy(c => c.Dateline_date);
+                    var query = db.Table<PostUnit>().Where(c => c.Title.Contains(postTitle)).OrderByDescending(c => c.Dateline_date);
                     foreach (var _c in query)
                     {
                         var unit = new PostViewModel(_c);
@@ -296,7 +296,7 @@ namespace DiaryRuSearcher
                 if (!string.IsNullOrEmpty(postKeyword))
                 {
                     Regex regexp = new Regex(postKeyword);
-                    var query = db.Table<PostUnit>().AsEnumerable().Where(c => regexp.IsMatch(c.Message_html)).OrderBy(c => c.Dateline_date);
+                    var query = db.Table<PostUnit>().AsEnumerable().Where(c => regexp.IsMatch(c.Message_html)).OrderByDescending(c => c.Dateline_date);
                     foreach (var _c in query)
                     {
                         var unit = new PostViewModel(_c);

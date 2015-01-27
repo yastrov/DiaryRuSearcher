@@ -27,3 +27,6 @@ I want to create search programm for this webservice, update my encoding skills,
     install-package Newtonsoft.Json
     install-package sqlite-net
     System.Data.SQLite (Install with NuGet and next from [http://system.data.sqlite.org/index.html/doc/trunk/www/downloads.wiki](http://system.data.sqlite.org/index.html/doc/trunk/www/downloads.wiki) setup bundle for x86 (how support x64?) and manualy add reference to your project.)
+
+
+Write your API key (appkey and key variables) to: \\DiaryRuSearcher\\DiaryAPIClient\\DiaryAPIClientMain.cs

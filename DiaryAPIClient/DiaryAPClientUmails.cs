@@ -29,7 +29,7 @@ namespace DiaryAPI
             return result;
         }
 
-        public List<UmailUnit> UmailsGet(string folder, int from)
+        public List<UmailUnit> UmailsGet(string folder, Int64 from)
         {
             List<UmailUnit> result;
             NameValueCollection nvc = new NameValueCollection();
@@ -123,7 +123,7 @@ namespace DiaryAPI
             return result;
         }
 
-        public async Task<List<UmailUnit>> UmailsGetAsync(string folder, int from)
+        public async Task<List<UmailUnit>> UmailsGetAsync(string folder, Int64 from)
         {
             List<UmailUnit> result;
             NameValueCollection nvc = new NameValueCollection();
@@ -145,15 +145,17 @@ namespace DiaryAPI
         public List<UmailUnit> AllUmailsGetInFolderAsync(UmailFolderUnit folderUnit)
         {
             List<UmailUnit> result = new List<UmailUnit>();
-            int i = 0;
+            Int64 i = 0;
             List<UmailUnit> r;
             while (i < folderUnit.Count)
             {
                 r = UmailsGet(folderUnit.Folderid.Trim(), i);
+                var count = r.Count();
+                if (count == 0)
+                    break;
                 result.AddRange(r);
                 System.Threading.Thread.Sleep(1000);
-                //i += Convert.ToUInt64(r.Count());
-                i += r.Count();
+                i += Convert.ToInt64(r.Count());
             }
             return result;
         }
@@ -162,17 +164,19 @@ namespace DiaryAPI
                                                             IUmailProcessor processor,
                                                             CancellationToken cancellationToken)
         {
-            int i = 0;
+            Int64 i = 0;
             List<UmailUnit> r;
             while (i < folderUnit.Count)
             {
                 r = await UmailsGetAsync(folderUnit.Name, i);
+                var count = r.Count();
+                if (count == 0)
+                    break;
                 foreach (var umail in r)
                     processor.ProcessUmail(umail);
                 System.Threading.Thread.Sleep(1000);
                 cancellationToken.ThrowIfCancellationRequested();
-                //i += Convert.ToUInt64(r.Count());
-                i += r.Count();
+                i += Convert.ToInt64(r.Count());
             }
         }
         public async Task AllUmailsGetInAllFoldersProcessingAsync(IUmailProcessor processor,

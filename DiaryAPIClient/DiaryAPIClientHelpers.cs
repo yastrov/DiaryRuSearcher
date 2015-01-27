@@ -81,10 +81,12 @@ namespace DiaryAPI
         {
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new WebException(response.StatusDescription);
+            var settings = new JsonSerializerSettings();
+            settings.NullValueHandling = NullValueHandling.Ignore;
             using (Stream oStream = response.GetResponseStream())
             {
                 StreamReader reader = new StreamReader(oStream);
-                return JsonConvert.DeserializeObject<T>(reader.ReadToEnd());
+                return JsonConvert.DeserializeObject<T>(reader.ReadToEnd(), settings);
             }
         }
     }

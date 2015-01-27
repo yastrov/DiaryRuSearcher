@@ -118,8 +118,10 @@ namespace DiaryAPI
 
                 }
                 System.Threading.Thread.Sleep(1000);
-                i += Convert.ToInt64(r.Count());
-                //i += r.Count();
+                var count = r.Count();
+                if (count == 0)
+                    break;
+                i += Convert.ToInt64(count);
                 onProgressPercentChanged.Report(i / post_count);
             }
         }

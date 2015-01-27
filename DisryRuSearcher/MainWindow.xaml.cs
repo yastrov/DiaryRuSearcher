@@ -61,6 +61,9 @@ namespace DiaryRuSearcher
                 }
             });
 #endif
+            productNameLabel.Content = AboutHelper.AssemblyProduct;
+            versionLabel.Content = AboutHelper.AssemblyVersion;
+            copyrightLabel.Content = AboutHelper.AssemblyCopyright.Replace("Copyright ", String.Empty);
         }
 
         #region Button clicks

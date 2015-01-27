@@ -4,6 +4,10 @@
         Title="MainWindow" Height="600" Width="525"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
+        <Style x:Key="myAboutLabelStyle" TargetType="{x:Type Label}">
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        
         <DataTemplate x:Key="PostsDataTemplate">
             <Grid Margin="2,2,2,2">
                 <Grid.ColumnDefinitions>
@@ -90,8 +94,8 @@
                     <Label Content="Логин:" Grid.Row="1" Grid.Column="0"/>
                     <Label Content="Пароль:" Grid.Row="2" Grid.Column="0"/>
                     <StackPanel Orientation="Horizontal" Grid.Column="0"  Grid.Row="3" Grid.ColumnSpan="2">
-                    <Button Name="goButton" Content="Загрузить" Click="goButton_Click" Width="160"/>
-                    <Button Name="cancelButton" Content="Прервать" Click="saverButton_Click" Width="145"/>
+                        <Button Name="goButton" Content="Загрузить" Click="goButton_Click" Width="160"/>
+                        <Button Name="cancelButton" Content="Прервать" Click="saverButton_Click" Width="145"/>
                     </StackPanel>
                     <PasswordBox Name="passwordBox" Grid.Row="2" Grid.Column="1" Password=""/>
                     <TextBox Name="loginBox" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" Text=""/>
@@ -182,6 +186,41 @@
             </TabItem>
             <TabItem Header="О программе">
                 <Grid Height="Auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="31*"/>
+                        <RowDefinition Height="31*"/>
+                        <RowDefinition Height="31*"/>
+                        <RowDefinition Height="31*"/>
+                        <RowDefinition Height="436*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="87*"/>
+                        <ColumnDefinition Width="167*"/>
+                        <ColumnDefinition Width="127*"/>
+                        <ColumnDefinition Width="127*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Продукт:" Grid.Row="0" Grid.Column="0" Style="{StaticResource myAboutLabelStyle}" />
+                    <Label Content="Версия:" Grid.Row="1" Grid.Column="0" Style="{StaticResource myAboutLabelStyle}" />
+                    <Label Content="Copyright:" Grid.Row="2" Grid.Column="0" Style="{StaticResource myAboutLabelStyle}" />
+
+                    <Label Name="productNameLabel" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"/>
+                    <Label Name="versionLabel" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" />
+                    <Label Name="copyrightLabel" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" />
+
+                    <Label Content="Описание:" Grid.Row="3" Grid.ColumnSpan="4" Style="{StaticResource myAboutLabelStyle}"/>
+                    <ScrollViewer Grid.Row="4" Grid.ColumnSpan="4"  Margin="1,1,1,1"
+                          HorizontalAlignment="Center" HorizontalContentAlignment="Center" Width="Auto">
+                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" Width="auto">
+                Эта программа распространяется "как есть", под свободной лицензией (MIT License), автор не несёт ответственности за ваши действия или возможные проблемы появившиеся вследствии использования программы.<LineBreak/>
+                Назначение: поиск постов, комментариев и личной переписки на сервисе <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="http://diary.ru">http://diary.ru</Hyperlink> с помощью ключевых слов. (В некоторых случаях поддерживаются регулярные выражения).
+                <LineBreak/>
+                <LineBreak/>Ссылки:<LineBreak/>
+                <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://github.com/yastrov/DiaryRuSearcher/releases">Новые релизы</Hyperlink>
+                <LineBreak/>
+                Написано Астровым Юрием, 2015 год<LineBreak/>
+                Используется: WPF, JSON.NET, SQLITE-NET.
+                        </TextBlock>
+                    </ScrollViewer>
                 </Grid>
             </TabItem>
         </TabControl>

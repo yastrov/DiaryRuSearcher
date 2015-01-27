@@ -61,8 +61,19 @@ namespace DiaryAPI.JSONResponseClasses
         public string Dateline_date { get; set; }
         public string Access { get; set; }
         public string Message_src { get; set; }
-
+        public string Message_html { get; set; } // No usable?
+        [SQLite.Ignore]
         public string Url { get { return this.MakeUrl(); } }
+        [SQLite.Ignore]
+        public string Message
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(this.Message_html)) return this.Message_html;
+                if (!string.IsNullOrEmpty(this.Message_src)) return this.Message_src;
+                return string.Empty;
+            }
+        }
 
         public int GetNumOfComments()
         {

@@ -17,6 +17,40 @@ namespace DiaryRuSearcher.ViewsModels
         public string From_userid { get; set; }
         public string No_smilies { get; set; }
 
+        public string Url { get { return this.MakeUrl(); } }
+
+        public string MakeUrl()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("http://www.diary.ru/u-mail/read/?u_id=")
+                .Append(this.Umailid);
+            return sb.ToString();
+        }
+        public string MessageForView
+        {
+            get
+            {
+
+                if (!string.IsNullOrEmpty(this.Message_html))
+                {
+                    int len = (this.Message_html.Length > 256) ? 256 : this.Message_html.Length;
+                    return this.Message_html.Substring(0, len);
+                }
+                return string.Empty;
+            }
+        }
+
+        public string DateTimeValue
+        {
+            get { return ConvertFromUnixTimestamp(Convert.ToDouble(this.Dateline)).ToLongDateString(); }
+        }
+
+        public static DateTime ConvertFromUnixTimestamp(double timestamp)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return origin.AddSeconds(timestamp);
+        }
+
         public UmailViewModel(DiaryAPI.JSONResponseClasses.UmailUnit umail)
         {
             this.From_username = umail.From_username;
@@ -43,5 +77,5 @@ namespace DiaryRuSearcher.ViewsModels
             return umail;
         }
     }
-    
+
 }

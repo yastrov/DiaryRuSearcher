@@ -46,6 +46,7 @@ namespace DiaryAPI.JSONResponseClasses
         public string Author_userid { get; set; }
         public string Shortname { get; set; }
         public string Message_html { get; set; }
+        public string Message_src { get; set; }
         public string Can_delete { get; set; }
         public string Author_jtype { get; set; }
 

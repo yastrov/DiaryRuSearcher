@@ -32,8 +32,48 @@ namespace DiaryRuSearcher.ViewsModels
         public string Dateline_date { get; set; }
         public string Access { get; set; }
         public string Message_src { get; set; }
-
+        public string Message_html { get; set; } // No usable?
+        [SQLite.Ignore]
         public string Url { get { return this.MakeUrl(); } }
+        [SQLite.Ignore]
+        public string Message
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(this.Message_html)) return this.Message_html;
+                if (!string.IsNullOrEmpty(this.Message_src)) return this.Message_src;
+                return string.Empty;
+            }
+        }
+        public string MessageForView
+        {
+            get
+            {
+
+                if (!string.IsNullOrEmpty(this.Message_html))
+                {
+                    int len = (this.Message_html.Length > 256) ? 256 : this.Message_html.Length;
+                    return this.Message_html.Substring(0, len);
+                }
+                if (!string.IsNullOrEmpty(this.Message_src))
+                {
+                    int len = (this.Message_html.Length > 256) ? 256 : this.Message_html.Length;
+                    return this.Message_src.Substring(0, len);
+                }
+                return string.Empty;
+            }
+        }
+
+        public string DateTimeValue 
+        {
+            get { return ConvertFromUnixTimestamp(Convert.ToDouble(this.Dateline_date)).ToLongDateString(); }
+        }
+
+        public static DateTime ConvertFromUnixTimestamp(double timestamp)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return origin.AddSeconds(timestamp);
+        }
 
         public Int64 GetNumOfComments()
         {
@@ -81,6 +121,7 @@ namespace DiaryRuSearcher.ViewsModels
             this.Subscribed = post.Subscribed;
             //this.Tags_data = post.Tags_data;
             this.Title = post.Title;
+            this.Message_html = post.Message_html;
         }
 
         public static DiaryAPI.JSONResponseClasses.PostUnit ModelFromView(PostViewModel view)
@@ -109,6 +150,7 @@ namespace DiaryRuSearcher.ViewsModels
             post.Subscribed = view.Subscribed;
             //post.Tags_data = view.Tags_data;
             post.Title = view.Title;
+            post.Message_html = view.Message_html;
             return post;
         }
     }

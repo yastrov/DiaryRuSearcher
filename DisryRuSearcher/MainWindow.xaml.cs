@@ -41,18 +41,39 @@ namespace DiaryRuSearcher
         #region Button clicks
         async private void goButton_Click(object sender, RoutedEventArgs e)
         {
-            await Auth();
+            await processGoButtonClick();
         }
-
+        async private Task processGoButtonClick()
+        {
+            try
+            {
+                await Auth();
+                if (downloadPostsCheckBox.IsChecked ?? false)
+                {
+                    string journalShortname = journalShortNameTextBox.Text.Trim();
+                    if(!String.IsNullOrEmpty(journalShortname))
+                    {
+                        journalShortname = journalShortname.Replace("http://", String.Empty);
+                        journalShortname = journalShortname.Replace("diary.ru", String.Empty);
+                        journalShortname = journalShortname.Replace("/", String.Empty);
+                    }
+                    await downloadPostsAndComments(journalShortname, downloadCommentsCheckBox.IsChecked ?? false);
+                }
+                if (downloadUmailsCheckBox.IsChecked ?? false)
+                {
+                    await downloadUmails();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
         private void saverButton_Click(object sender, RoutedEventArgs e)
         {
             cancelSource.Cancel();
         }
 
-        private void Show_Click(object sender, RoutedEventArgs e)
-        {
-            ;
-        }
         private void commentsSearchButton_Click(object sender, RoutedEventArgs e)
         {
             string commentAuthor = commentAuthorTextBox.Text.Trim();
@@ -63,11 +84,12 @@ namespace DiaryRuSearcher
         private void umailSearchButton_Click(object sender, RoutedEventArgs e)
         {
             string umailSender= umailSenderNameTextBox.Text.Trim();
-            string umailReceiver = umailReciverNameTextBox.Text.Trim();
             string umailKeyword = umailKeywordTextBox.Text.Trim();
-            umailsCollection = new DiaryDataBase().GetUmailsBySenderReceiverKeyword(umailSender, umailReceiver, umailKeyword);
-            umailFoldersListView.ItemsSource = umailsCollection;
+            string umailTitle = umailTitleTextBox.Text.Trim();
+            umailsCollection = new DiaryDataBase().GetUmailsBySenderTitleKeyword(umailSender, umailTitle, umailKeyword);
+            umailsListView.ItemsSource = umailsCollection;
         }
+
         #endregion
 
         #region for DiaryAPI
@@ -77,12 +99,16 @@ namespace DiaryRuSearcher
             {
                 await diaryAPIClient.AuthSecureAsync(loginBox.Text.Trim(), passwordBox.SecurePassword);
             }
+            catch (DiaryAPIClientException ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
             }
         }
-        async private void downloadPostsAndComments(string shortname, bool withComments)
+        async private Task downloadPostsAndComments(string shortname, bool withComments)
         {
             try
             {
@@ -105,7 +131,7 @@ namespace DiaryRuSearcher
                 MessageBox.Show(ex.ToString());
             }
         }
-        async private void downloadUmailFolders()
+        async private Task downloadUmailFolders()
         {
             try
             {
@@ -119,7 +145,6 @@ namespace DiaryRuSearcher
                     {
                         saver.InsertUmailFolder(folder);
                     }
-                    TabControlUmailSearch_SelectionChanged();
                 }
                 catch (OperationCanceledException ex)
                 {
@@ -131,7 +156,7 @@ namespace DiaryRuSearcher
                 MessageBox.Show(ex.ToString());
             }
         }
-        async private void downloadUmails()
+        async private Task downloadUmails()
         {
             try
             {
@@ -166,11 +191,26 @@ namespace DiaryRuSearcher
                 System.Windows.MessageBox.Show(ex.Message, "Diary Ru Searcher", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-        
 
-        private void umailSearchButton_Click(object sender, RoutedEventArgs e)
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            var item = sender as TabControl;
+            var selected = item.SelectedItem as TabItem;
+            this.Title = selected.Header.ToString();
+            switch (selected.Name)
+            {
+                case "umailFindTabItem": 
+                    break;
+            }
+        }
 
+        private void postSearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            string postTitle = postSearchTitleTextBox.Text.Trim();
+            string postKeyword = postSearchKeywordTextBox.Text.Trim();
+            string postAuthor = postSearchAuthorTextBox.Text.Trim();
+            postsCollection = new DiaryDataBase().GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
+            postsListView.ItemsSource = postsCollection;
         }
     }
 }

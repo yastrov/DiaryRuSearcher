@@ -18,6 +18,7 @@ namespace DiaryRuSearcher.ViewsModels
         public string Author_userid { get; set; }
         public string Shortname { get; set; }
         public string Message_html { get; set; }
+        public string Message_src { get; set; }
         public string Can_delete { get; set; }
         public string Author_jtype { get; set; }
 
@@ -34,6 +35,36 @@ namespace DiaryRuSearcher.ViewsModels
             return sb.ToString();
         }
 
+        public string MessageForView
+        {
+            get
+            {
+
+                if (!string.IsNullOrEmpty(this.Message_html))
+                {
+                    int len = (this.Message_html.Length > 256) ? 256 : this.Message_html.Length;
+                    return this.Message_html.Substring(0, len);
+                }
+                if (!string.IsNullOrEmpty(this.Message_src))
+                {
+                    int len = (this.Message_html.Length > 256) ? 256 : this.Message_html.Length;
+                    return this.Message_src.Substring(0, len);
+                }
+                return string.Empty;
+            }
+        }
+
+        public string DateTimeValue
+        {
+            get { return ConvertFromUnixTimestamp(Convert.ToDouble(this.Dateline)).ToLongDateString(); }
+        }
+
+        public static DateTime ConvertFromUnixTimestamp(double timestamp)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return origin.AddSeconds(timestamp);
+        }
+
         public CommentViewModel(DiaryAPI.JSONResponseClasses.CommentUnit comment)
         {
             this.Author_avatar = comment.Author_avatar;
@@ -47,6 +78,7 @@ namespace DiaryRuSearcher.ViewsModels
             this.Commentid = comment.Commentid;
             this.Dateline = comment.Dateline;
             this.Message_html = comment.Message_html;
+            this.Message_src = comment.Message_src;
             this.Postid = comment.Postid;
         }
     }

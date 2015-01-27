@@ -17,6 +17,7 @@ using DiaryAPI;
 using System.Collections.ObjectModel;
 using DiaryRuSearcher.ViewsModels;
 using DiaryAPI.JSONResponseClasses;
+using System.Diagnostics;
 
 namespace DiaryRuSearcher
 {
@@ -33,15 +34,39 @@ namespace DiaryRuSearcher
         private ObservableCollection<CommentViewModel> commentsCollection = null;
         private ObservableCollection<UmailViewModel> umailsCollection = null;
         private ObservableCollection<UmailFolderViewModel> umailFoldersCollection = null;
+
         public MainWindow()
         {
             InitializeComponent();
+#if DEBUG
+            System.Windows.MessageBox.Show("Debug mode!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+#else
+            var checker = new NewVersionChecker();
+            checker.HasNewVersionAsync().ContinueWith(r =>
+            {
+                if (r.Result)
+                {
+                    var msr = MessageBox.Show("Доступна новая версия! Открыть в браузере?", this.Title, MessageBoxButton.YesNo, MessageBoxImage.Information);
+                    if (msr == MessageBoxResult.Yes)
+                    {
+                        try
+                        {
+                            Process.Start(NewVersionChecker.BrowserUrl);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Windows.MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+            });
+#endif
         }
 
         #region Button clicks
-        async private void goButton_Click(object sender, RoutedEventArgs e)
+        private void goButton_Click(object sender, RoutedEventArgs e)
         {
-            await processGoButtonClick();
+            processGoButtonClick().Start();
         }
         async private Task processGoButtonClick()
         {
@@ -51,7 +76,7 @@ namespace DiaryRuSearcher
                 if (downloadPostsCheckBox.IsChecked ?? false)
                 {
                     string journalShortname = journalShortNameTextBox.Text.Trim();
-                    if(!String.IsNullOrEmpty(journalShortname))
+                    if (!String.IsNullOrEmpty(journalShortname))
                     {
                         journalShortname = journalShortname.Replace("http://", String.Empty);
                         journalShortname = journalShortname.Replace("diary.ru", String.Empty);
@@ -83,7 +108,7 @@ namespace DiaryRuSearcher
         }
         private void umailSearchButton_Click(object sender, RoutedEventArgs e)
         {
-            string umailSender= umailSenderNameTextBox.Text.Trim();
+            string umailSender = umailSenderNameTextBox.Text.Trim();
             string umailKeyword = umailKeywordTextBox.Text.Trim();
             string umailTitle = umailTitleTextBox.Text.Trim();
             umailsCollection = new DiaryDataBase().GetUmailsBySenderTitleKeyword(umailSender, umailTitle, umailKeyword);
@@ -101,11 +126,11 @@ namespace DiaryRuSearcher
             }
             catch (DiaryAPIClientException ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         async private Task downloadPostsAndComments(string shortname, bool withComments)
@@ -123,12 +148,12 @@ namespace DiaryRuSearcher
                 }
                 catch (OperationCanceledException ex)
                 {
-                    MessageBox.Show(ex.ToString());
+                    MessageBox.Show("Прервано пользователем!", this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (DiaryAPIClientException ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         async private Task downloadUmailFolders()
@@ -148,12 +173,12 @@ namespace DiaryRuSearcher
                 }
                 catch (OperationCanceledException ex)
                 {
-                    MessageBox.Show(ex.ToString());
+                    MessageBox.Show("Прервано пользователем!", this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (DiaryAPIClientException ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         async private Task downloadUmails()
@@ -169,12 +194,12 @@ namespace DiaryRuSearcher
                 }
                 catch (OperationCanceledException ex)
                 {
-                    MessageBox.Show(ex.ToString());
+                    MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (DiaryAPIClientException ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -189,18 +214,6 @@ namespace DiaryRuSearcher
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show(ex.Message, "Diary Ru Searcher", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var item = sender as TabControl;
-            var selected = item.SelectedItem as TabItem;
-            this.Title = selected.Header.ToString();
-            switch (selected.Name)
-            {
-                case "umailFindTabItem": 
-                    break;
             }
         }
 

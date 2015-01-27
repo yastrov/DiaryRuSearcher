@@ -189,7 +189,7 @@ namespace DiaryRuSearcher
                     foreach (var unit in r.Unit)
                     {
                         // Remove "v"
-                        var release = unit.Tag_name.Substring(1, unit.Tag_name.Length);
+                        var release = unit.Tag_name.Replace("v", String.Empty);
                         if (CompareVersions(currentRelease, release) > 0)
                         {
                             flag = true;

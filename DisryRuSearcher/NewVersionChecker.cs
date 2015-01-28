@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,12 +12,6 @@ using System.Threading.Tasks;
 namespace DiaryRuSearcher
 {
     #region GithubReleasesResponse
-
-    public class Rootobject
-    {
-        public ReleaseObject[] Unit { get; set; }
-    }
-
     public class ReleaseObject
     {
         public string Url { get; set; }
@@ -96,7 +91,7 @@ namespace DiaryRuSearcher
     public class NewVersionChecker
     {
         public const string BrowserUrl = "https://github.com/yastrov/DiaryRuSearcher/releases";
-        public const string APIUrl = "https://api.github.com/repos/yastrov/DiaryRuSearcher/release";
+        public const string APIUrl = "https://api.github.com/repos/yastrov/DiaryRuSearcher/releases";
         #region Release helpers
         /// <summary>
         /// Release version from assembly
@@ -127,7 +122,8 @@ namespace DiaryRuSearcher
         {
             var aa = first.Split('.');
             var bb = second.Split('.');
-            for (int i = 0; i < aa.Length; i++)
+            var len = Math.Min(aa.Length, bb.Length);
+            for (int i = 0; i < len; i++)
             {
                 if (int.Parse(aa[i]) > int.Parse(bb[i])) return 1;
                 if (int.Parse(aa[i]) < int.Parse(bb[i])) return -1;
@@ -136,9 +132,9 @@ namespace DiaryRuSearcher
         }
         #endregion
         /// <summary>
-        /// Main function: Has Github new version?
+        /// Main function: Is aviable new version on GitHub?
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true, if new version exists</returns>
         public Boolean HasNewVersion()
         {
             Boolean flag = false;
@@ -149,11 +145,11 @@ namespace DiaryRuSearcher
                 {
                     if (response.StatusCode != HttpStatusCode.OK)
                         return flag;
-                    var r = GetObjectFromJson<Rootobject>(response);
-                    foreach (var unit in r.Unit)
+                    var r = GetObjectListFromJson<ReleaseObject>(response);
+                    foreach (var unit in r)
                     {
                         var release = unit.Tag_name.Replace("v", String.Empty);
-                        if (CompareVersions(currentRelease, release) > 0)
+                        if (CompareVersions(release, currentRelease) > 0)
                         {
                             flag = true;
                             break;
@@ -172,9 +168,9 @@ namespace DiaryRuSearcher
             return flag;
         }
         /// <summary>
-        /// Main function: Has Github new version?
+        /// Main function: Is aviable new version on GitHub?
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true, if new version exists</returns>
         public async Task<Boolean> HasNewVersionAsync()
         {
             Boolean flag = false;
@@ -185,12 +181,11 @@ namespace DiaryRuSearcher
                 {
                     if (response.StatusCode != HttpStatusCode.OK)
                         return flag;
-                    var r = GetObjectFromJson<Rootobject>(response);
-                    foreach (var unit in r.Unit)
+                    var r = GetObjectListFromJson<ReleaseObject> (response);
+                    foreach (var unit in r)
                     {
-                        // Remove "v"
                         var release = unit.Tag_name.Replace("v", String.Empty);
-                        if (CompareVersions(currentRelease, release) > 0)
+                        if (CompareVersions(release, currentRelease) > 0)
                         {
                             flag = true;
                             break;
@@ -208,22 +203,38 @@ namespace DiaryRuSearcher
             }
             return flag;
         }
+
+        /// <summary>
+        /// Deserialize JSON string "[{},{}] to list of objects T"
+        /// </summary>
+        /// <typeparam name="T">Type of element in List</typeparam>
+        /// <param name="jsonString">String which contained JSON</param>
+        /// <returns>IList<T></returns>
+        public static IList<T> DeserializeToList<T>(string jsonString)
+        {
+            var array = JArray.Parse(jsonString);
+            IList<T> objectsList = new List<T>();
+            foreach (var item in array)
+            {
+                    objectsList.Add(item.ToObject<T>());
+            }
+            return objectsList;
+        }
+
         /// <summary>
         /// Support function for work with JSON.NET
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="response"></param>
         /// <returns></returns>
-        public static T GetObjectFromJson<T>(HttpWebResponse response)
+        public static IList<T> GetObjectListFromJson<T>(HttpWebResponse response)
         {
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new WebException(response.StatusDescription);
-            var settings = new JsonSerializerSettings();
-            settings.NullValueHandling = NullValueHandling.Ignore;
             using (Stream oStream = response.GetResponseStream())
             {
                 StreamReader reader = new StreamReader(oStream);
-                return JsonConvert.DeserializeObject<T>(reader.ReadToEnd(), settings);
+                return DeserializeToList<T>(reader.ReadToEnd());
             }
         }
 

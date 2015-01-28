@@ -26,7 +26,7 @@ namespace DiaryRuSearcher
     /// </summary>
     public partial class MainWindow : Window
     {
-        private IProgress<Int64> progress;
+        private IProgress<Double> progress;
         private CancellationTokenSource cancelSource;
         private DiaryAPI.DiaryAPIClient diaryAPIClient = new DiaryAPIClient();
 
@@ -41,34 +41,19 @@ namespace DiaryRuSearcher
 #if DEBUG
             System.Windows.MessageBox.Show("Debug mode!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
 #else
-            var checker = new NewVersionChecker();
-            checker.HasNewVersionAsync().ContinueWith(r =>
-            {
-                if (r.Result)
-                {
-                    var msr = MessageBox.Show("Доступна новая версия! Открыть в браузере?", this.Title, MessageBoxButton.YesNo, MessageBoxImage.Information);
-                    if (msr == MessageBoxResult.Yes)
-                    {
-                        try
-                        {
-                            Process.Start(NewVersionChecker.BrowserUrl);
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Windows.MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                }
-            });
+            checkNewVersion();
 #endif
+            #region About info load to About page
             productNameLabel.Content = AboutHelper.AssemblyProduct;
             versionLabel.Content = AboutHelper.AssemblyVersion;
             copyrightLabel.Content = AboutHelper.AssemblyCopyright.Replace("Copyright ", String.Empty);
+            #endregion
         }
 
         #region Button clicks
         async private void goButton_Click(object sender, RoutedEventArgs e)
         {
+            goButton.IsEnabled = false;
             await processGoButtonClick();
         }
         async private Task processGoButtonClick()
@@ -92,12 +77,21 @@ namespace DiaryRuSearcher
                     await downloadUmails();
                 }
             }
+            catch (OperationCanceledException ex)
+            {
+                MessageBox.Show("Прервано пользователем!", this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (DiaryAPIClientException ex)
+            {
+                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
+                goButton.IsEnabled = true;
                 System.Windows.MessageBox.Show("Загрузка данных завершена!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
@@ -106,6 +100,7 @@ namespace DiaryRuSearcher
             cancelSource.Cancel();
         }
 
+        #region Search in DB
         private void commentsSearchButton_Click(object sender, RoutedEventArgs e)
         {
             string commentAuthor = commentAuthorTextBox.Text.Trim();
@@ -121,97 +116,69 @@ namespace DiaryRuSearcher
             umailsCollection = new DiaryDataBase().GetUmailsBySenderTitleKeyword(umailSender, umailTitle, umailKeyword);
             umailsListView.ItemsSource = umailsCollection;
         }
+        private void postSearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            string postTitle = postSearchTitleTextBox.Text.Trim();
+            string postKeyword = postSearchKeywordTextBox.Text.Trim();
+            string postAuthor = postSearchAuthorTextBox.Text.Trim();
+            postsCollection = new DiaryDataBase().GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
+            postsListView.ItemsSource = postsCollection;
+        }
+        #endregion
 
+        private void checkVersionButton_Click(object sender, RoutedEventArgs e)
+        {
+            checkNewVersion();
+        }
         #endregion
 
         #region for DiaryAPI
         async Task Auth()
         {
-            try
-            {
-                await diaryAPIClient.AuthSecureAsync(loginBox.Text.Trim(), passwordBox.SecurePassword);
-            }
-            catch (DiaryAPIClientException ex)
-            {
-                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            await diaryAPIClient.AuthSecureAsync(loginBox.Text.Trim(), passwordBox.SecurePassword);
+
         }
         async private Task downloadPostsAndComments(string shortname, bool withComments)
         {
-            try
-            {
-                progress = new Progress<Int64>(i => progressBar.Value = i);
-                cancelSource = new CancellationTokenSource();
-                try
-                {
-                    DiarySaverDB saver = new DiarySaverDB();
-                    var journal = diaryAPIClient.JournalGet("", shortname);
-                    //In theoretical, you may pass "await" keyword and see the result:
-                    await diaryAPIClient.AllPostsGetProcessingAsync("diarytype", journal, withComments, saver, progress, cancelSource.Token);
-                }
-                catch (OperationCanceledException ex)
-                {
-                    MessageBox.Show("Прервано пользователем!", this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            catch (DiaryAPIClientException ex)
-            {
-                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            progress = new Progress<Double>(i => progressBar.Value = i);
+            cancelSource = new CancellationTokenSource();
+
+            DiarySaverDB saver = new DiarySaverDB();
+            var journal = diaryAPIClient.JournalGet("", shortname);
+            //In theoretical, you may pass "await" keyword and see the result:
+            await diaryAPIClient.AllPostsGetProcessingAsync("diarytype", journal, withComments, saver, progress, cancelSource.Token);
         }
         async private Task downloadUmailFolders()
         {
-            try
+            progress = new Progress<Double>(i => progressBar.Value = i);
+            cancelSource = new CancellationTokenSource();
+            List<UmailFolderUnit> folders = await diaryAPIClient.UmailGetFoldersAsync();
+            DiarySaverDB saver = new DiarySaverDB();
+            foreach (var folder in folders)
             {
-                progress = new Progress<Int64>(i => progressBar.Value = i);
-                cancelSource = new CancellationTokenSource();
-                try
-                {
-                    List<UmailFolderUnit> folders = await diaryAPIClient.UmailGetFoldersAsync();
-                    DiarySaverDB saver = new DiarySaverDB();
-                    foreach (var folder in folders)
-                    {
-                        saver.InsertUmailFolder(folder);
-                    }
-                }
-                catch (OperationCanceledException ex)
-                {
-                    MessageBox.Show("Прервано пользователем!", this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                saver.InsertUmailFolder(folder);
             }
-            catch (DiaryAPIClientException ex)
-            {
-                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+
         }
         async private Task downloadUmails()
         {
-            try
-            {
-                progress = new Progress<Int64>(i => progressBar.Value = i);
-                cancelSource = new CancellationTokenSource();
-                try
-                {
-                    DiarySaverDB saver = new DiarySaverDB();
-                    await diaryAPIClient.AllUmailsGetInAllFoldersProcessingAsync(saver, progress, cancelSource.Token);
-                }
-                catch (OperationCanceledException ex)
-                {
-                    MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            catch (DiaryAPIClientException ex)
-            {
-                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+
+            progress = new Progress<Double>(i => progressBar.Value = i);
+            cancelSource = new CancellationTokenSource();
+
+            DiarySaverDB saver = new DiarySaverDB();
+            await diaryAPIClient.AllUmailsGetInAllFoldersProcessingAsync(saver, progress, cancelSource.Token);
+
+
         }
 
         #endregion
 
+        /// <summary>
+        /// Processing to Click to link on form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
             try
@@ -224,13 +191,52 @@ namespace DiaryRuSearcher
             }
         }
 
-        private void postSearchButton_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Check new Version aviable on GitHub, show MessageBox if yes.
+        /// </summary>
+        private void checkNewVersion()
         {
-            string postTitle = postSearchTitleTextBox.Text.Trim();
-            string postKeyword = postSearchKeywordTextBox.Text.Trim();
-            string postAuthor = postSearchAuthorTextBox.Text.Trim();
-            postsCollection = new DiaryDataBase().GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
-            postsListView.ItemsSource = postsCollection;
+            var checker = new NewVersionChecker();
+            try
+            {
+                checker.HasNewVersionAsync().ContinueWith(r =>
+                {
+                    if (r.Result)
+                    {
+                        var msr = MessageBox.Show("Доступна новая версия! Открыть в браузере?", "Diary Ru Searcher", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                        if (msr == MessageBoxResult.Yes)
+                        {
+                            try
+                            {
+                                Process.Start(NewVersionChecker.BrowserUrl);
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Windows.MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            if (cancelSource != null)
+            {
+                try
+                {
+                    cancelSource.Cancel();
+                }
+                catch (Exception ex)
+                {
+                    ;
+                }
+            }
         }
     }
 }

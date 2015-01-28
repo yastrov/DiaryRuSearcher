@@ -16,7 +16,7 @@ namespace DiaryRuSearcher.ViewsModels
         {
             this.Name = folder.Name;
             this.Count = folder.Count;
-            this.Folderid = folder.Folderid;
+            this.Folderid = folder.Folderid.Replace("#", String.Empty);
         }
     }
 }

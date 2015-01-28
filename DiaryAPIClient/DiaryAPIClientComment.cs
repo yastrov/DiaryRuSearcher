@@ -44,7 +44,7 @@ namespace DiaryAPI
                 foreach (PostUnit post in posts)
                 {
                     result.AddRange(AllCommentsGetForPost(post));
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
                 }
             return result;
         }

@@ -9,8 +9,11 @@ namespace DiaryAPI
     public partial class DiaryAPIClient
     {
         public const string DiaryAPI_URL = "http://www.diary.ru/api/";
+        #region API keys
         private const string appkey = ""; // ok
         private const string key = ""; // pk
+        #endregion
+        private TimeSpan timeoutBetweenRequests = TimeSpan.FromMilliseconds(1000);
         private string _sid;
         public string SID
         {

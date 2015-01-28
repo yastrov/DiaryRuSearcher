@@ -35,9 +35,9 @@ namespace DiaryAPI
             NameValueCollection nvc = new NameValueCollection();
             nvc.Add("method", "umail.get");
             nvc.Add("sid", _sid);
-            nvc.Add("folder", folder);
-            if(from != 0)
-            nvc.Add("from", from.ToString());
+            nvc.Add("folder", folder.Trim());
+            if (from != 0)
+                nvc.Add("from", from.ToString());
             string postString = NameValueCollectionToUrlString(nvc);
             using (HttpWebResponse response = this._Request(postString, "GET", null))
             {
@@ -57,7 +57,7 @@ namespace DiaryAPI
             {
                 r = UmailsGet(folderUnit.Folderid.Trim(), i);
                 result.AddRange(r);
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
                 //i += Convert.ToUInt64(r.Count());
                 i += r.Count();
             }
@@ -84,7 +84,7 @@ namespace DiaryAPI
                 r = UmailsGet(folderUnit.Name, i);
                 foreach (var umail in r)
                     processor.ProcessUmail(umail);
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
                 //i += Convert.ToUInt64(r.Count());
                 i += r.Count();
             }
@@ -100,7 +100,7 @@ namespace DiaryAPI
                 }
                 catch (DiaryAPIClientException ex)
                 {
-                    Console.WriteLine(ex.ToString()); 
+                    Console.WriteLine(ex.ToString());
                 }
             }
         }
@@ -129,7 +129,7 @@ namespace DiaryAPI
             NameValueCollection nvc = new NameValueCollection();
             nvc.Add("method", "umail.get");
             nvc.Add("sid", _sid);
-            nvc.Add("folder", folder);
+            nvc.Add("folder", folder.Trim());
             if (from != 0)
                 nvc.Add("from", from.ToString());
             string postString = NameValueCollectionToUrlString(nvc);
@@ -154,7 +154,7 @@ namespace DiaryAPI
                 if (count == 0)
                     break;
                 result.AddRange(r);
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
                 i += Convert.ToInt64(r.Count());
             }
             return result;
@@ -162,45 +162,35 @@ namespace DiaryAPI
 
         public async Task AllUmailsGetInFolderProcessingAsync(UmailFolderUnit folderUnit,
                                                             IUmailProcessor processor,
+                                                            IProgress<Double> onProgressPercentChanged,
                                                             CancellationToken cancellationToken)
         {
             Int64 i = 0;
             List<UmailUnit> r;
             while (i < folderUnit.Count)
             {
-                r = await UmailsGetAsync(folderUnit.Name, i);
+                r = await UmailsGetAsync(folderUnit.Folderid.Trim(), i);
                 var count = r.Count();
                 if (count == 0)
                     break;
                 foreach (var umail in r)
                     processor.ProcessUmail(umail);
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
                 cancellationToken.ThrowIfCancellationRequested();
                 i += Convert.ToInt64(r.Count());
+                onProgressPercentChanged.Report(i / folderUnit.Count);
             }
         }
         public async Task AllUmailsGetInAllFoldersProcessingAsync(IUmailProcessor processor,
-                                                       IProgress<Int64> onProgressPercentChanged,
+                                                       IProgress<Double> onProgressPercentChanged,
                                                         CancellationToken cancellationToken)
         {
             var r = UmailGetFolders();
-            Int64 all_mails = 0, current = 0;
-            foreach (var f in r)
-                all_mails += f.Count;
             foreach (var folder in r)
             {
-                try
-                {
-                    if (folder.Count == 0) continue;
-                    current += folder.Count;
-                    await AllUmailsGetInFolderProcessingAsync(folder, processor, cancellationToken);
-                    onProgressPercentChanged.Report(current/all_mails);
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-                catch (DiaryAPIClientException ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
+                if (folder.Count == 0) continue;
+                await AllUmailsGetInFolderProcessingAsync(folder, processor, onProgressPercentChanged, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
             }
         }
         #endregion

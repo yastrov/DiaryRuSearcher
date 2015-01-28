@@ -68,7 +68,7 @@ namespace DiaryAPI.JSONResponseClasses
             List<UmailFolderUnit> result = new List<UmailFolderUnit>();
             foreach (KeyValuePair<string, UmailFolderUnit> kvp in this.Folders2)
             {
-                kvp.Value.Folderid = kvp.Key;
+                kvp.Value.Folderid = kvp.Key.Replace("#", String.Empty);
                 result.Add(kvp.Value);
             }
             return result;

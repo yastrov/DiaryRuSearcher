@@ -45,9 +45,8 @@ namespace DiaryAPI
             {
                 r = PostGet(diarytype, journal.Shortname, i);
                 result.AddRange(r);
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
                 i += Convert.ToInt64(r.Count());
-                //i += r.Count();
             }
             return result;
         }
@@ -57,7 +56,7 @@ namespace DiaryAPI
         {
 
             Int64 post_count = journal.Posts;
-            int i = 0;
+            Int64 i = 0;
             List<PostUnit> r;
             while (i < post_count)
             {
@@ -65,11 +64,10 @@ namespace DiaryAPI
                 foreach (var post in r)
                 {
                     processor.ProcessPost(post);
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
                     AllCommentsGetForPostProcessing(post, processor);
-                    System.Threading.Thread.Sleep(1000);
-                    //i += Convert.ToUInt64(r.Count());
-                    i += r.Count();
+                    System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
+                    i += Convert.ToInt64(r.Count());
                 }
             }
         }
@@ -100,7 +98,7 @@ namespace DiaryAPI
                                                 JournalUnit journal,
                                                 bool withComments,
                                                 IPostCommentsProcessor processor,
-                                                IProgress<Int64> onProgressPercentChanged,
+                                                IProgress<Double> onProgressPercentChanged,
                                                 CancellationToken cancellationToken)
         {
             Int64 post_count = journal.Posts;
@@ -112,12 +110,12 @@ namespace DiaryAPI
                 foreach (var post in r)
                 {
                     await Task.Run(() => { processor.ProcessPost(post); });
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
                     if (withComments)
                         await AllCommentsGetForPostProcessingAsync(post, processor);
 
                 }
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
                 var count = r.Count();
                 if (count == 0)
                     break;

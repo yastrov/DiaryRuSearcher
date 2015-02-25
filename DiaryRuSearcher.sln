@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.40121.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiaryAPI", "DiaryAPIClient\DiaryAPI.csproj", "{0AF0D53F-B6CE-4135-99B7-BD4E6054AA45}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTestAPI", "ConsoleTestAPI\ConsoleTestAPI.csproj", "{CD56DB4E-A49A-402E-B93B-418F81702D67}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiaryRuSearcher", "DisryRuSearcher\DiaryRuSearcher.csproj", "{6562647C-6054-48D2-8A93-22C3E9DB8DB4}"
 EndProject
@@ -31,16 +29,6 @@ Global
 		{0AF0D53F-B6CE-4135-99B7-BD4E6054AA45}.Release|x64.Build.0 = Release|x64
 		{0AF0D53F-B6CE-4135-99B7-BD4E6054AA45}.Release|x86.ActiveCfg = Release|x86
 		{0AF0D53F-B6CE-4135-99B7-BD4E6054AA45}.Release|x86.Build.0 = Release|x86
-		{CD56DB4E-A49A-402E-B93B-418F81702D67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CD56DB4E-A49A-402E-B93B-418F81702D67}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CD56DB4E-A49A-402E-B93B-418F81702D67}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{CD56DB4E-A49A-402E-B93B-418F81702D67}.Debug|x86.ActiveCfg = Debug|x86
-		{CD56DB4E-A49A-402E-B93B-418F81702D67}.Debug|x86.Build.0 = Debug|x86
-		{CD56DB4E-A49A-402E-B93B-418F81702D67}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CD56DB4E-A49A-402E-B93B-418F81702D67}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CD56DB4E-A49A-402E-B93B-418F81702D67}.Release|x64.ActiveCfg = Release|Any CPU
-		{CD56DB4E-A49A-402E-B93B-418F81702D67}.Release|x86.ActiveCfg = Release|x86
-		{CD56DB4E-A49A-402E-B93B-418F81702D67}.Release|x86.Build.0 = Release|x86
 		{6562647C-6054-48D2-8A93-22C3E9DB8DB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6562647C-6054-48D2-8A93-22C3E9DB8DB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6562647C-6054-48D2-8A93-22C3E9DB8DB4}.Debug|x64.ActiveCfg = Debug|x64

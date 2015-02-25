@@ -1,10 +1,11 @@
-﻿using System;
+﻿using DiaryAPI;
+using DiaryAPI.JSONResponseClasses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DiaryAPI;
-using DiaryAPI.JSONResponseClasses;
+
 
 namespace ConsoleTestAPI
 {

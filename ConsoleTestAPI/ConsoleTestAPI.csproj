@@ -72,6 +72,10 @@
       <Project>{0af0d53f-b6ce-4135-99b7-bd4e6054aa45}</Project>
       <Name>DiaryAPI</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DisryRuSearcher\DiaryRuSearcher.csproj">
+      <Project>{6562647c-6054-48d2-8a93-22c3e9db8db4}</Project>
+      <Name>DiaryRuSearcher</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

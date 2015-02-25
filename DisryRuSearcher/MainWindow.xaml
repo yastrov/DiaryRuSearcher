@@ -2,12 +2,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Diary Ru Search" Height="600" Width="525"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Window.Resources>
         <Style x:Key="myAboutLabelStyle" TargetType="{x:Type Label}">
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
-        
+
         <DataTemplate x:Key="PostsDataTemplate">
             <Grid Margin="2,2,2,2">
                 <Grid.ColumnDefinitions>
@@ -70,10 +70,10 @@
                 <TextBlock Grid.Column="3" Text="{Binding MessageForView}"/>
             </Grid>
         </DataTemplate>
+
     </Window.Resources>
     <Grid Margin="0,0,0,0">
-        <TabControl
-		    >
+        <TabControl>
             <TabItem Header="Главная" Name="mainTabItem">
                 <Grid Height="Auto" Width="Auto">
                     <Grid.RowDefinitions>
@@ -134,7 +134,7 @@
                     <TextBox Name="postSearchAuthorTextBox" Grid.Column="1" Grid.Row="0"/>
                     <TextBox Name="postSearchTitleTextBox" Grid.Column="1" Grid.Row="1"/>
                     <TextBox Name="postSearchKeywordTextBox" Grid.Column="1" Grid.Row="2" ToolTip="Ключевое слово или регулярное выражение для поиска в тексте."/>
-                    <ListView Name="postsListView" ItemTemplate="{StaticResource PostsDataTemplate}" Grid.ColumnSpan="4" Grid.Row="3">
+                    <ListView Name="postsListView" ItemTemplate="{StaticResource PostsDataTemplate}" ItemsSource="{Binding PostsCollection}" Grid.ColumnSpan="4" Grid.Row="3" DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
                     </ListView>
                     <Button Name="postSearchButton" Content="Искать" Click="postSearchButton_Click" Grid.Column="2" Grid.RowSpan="3"/>
                 </Grid>
@@ -156,7 +156,7 @@
                     <TextBox Name="commentAuthorTextBox" Grid.Column="1" Grid.Row="0"/>
                     <Label Content="Ключевое слово:" Grid.Column="0" Grid.Row="1"/>
                     <TextBox Name="commentsKeywordTextBox"  Grid.Column="1" Grid.Row="1" ToolTip="Ключевое слово или регулярное выражение для поиска в тексте."/>
-                    <ListView Name="commentsListView" ItemTemplate="{StaticResource CommentDataTemplate}" Grid.ColumnSpan="3" Grid.Row="2">
+                    <ListView Name="commentsListView" ItemTemplate="{StaticResource CommentDataTemplate}" ItemsSource="{Binding CommentsCollection}" Grid.ColumnSpan="3" Grid.Row="2">
                     </ListView>
                 </Grid>
             </TabItem>
@@ -180,7 +180,7 @@
                     <TextBox Name="umailTitleTextBox" Grid.Column="1" Grid.Row="1"/>
                     <Label Content="Ключевое слово:" Grid.Column="0" Grid.Row="2"/>
                     <TextBox Name="umailKeywordTextBox" Grid.Column="1" Grid.Row="2" ToolTip="Ключевое слово или регулярное выражение для поиска в тексте."/>
-                    <ListView Name="umailsListView"  ItemTemplate="{StaticResource UmailsDataTemplate}" Grid.ColumnSpan="3" Grid.Row="3">
+                    <ListView Name="umailsListView"  ItemTemplate="{StaticResource UmailsDataTemplate}" ItemsSource="{Binding UmailsCollection}"  Grid.ColumnSpan="3" Grid.Row="3">
                     </ListView>
                 </Grid>
             </TabItem>

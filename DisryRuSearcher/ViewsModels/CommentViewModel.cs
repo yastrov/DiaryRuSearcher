@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DiaryRuSearcher.ViewsModels
 {
-    class CommentViewModel
+    public class CommentViewModel: INotifyPropertyChanged
     {
         public string Can_edit { get; set; }
         public string Author_title { get; set; }
@@ -80,6 +81,14 @@ namespace DiaryRuSearcher.ViewsModels
             this.Message_html = comment.Message_html;
             this.Message_src = comment.Message_src;
             this.Postid = comment.Postid;
+        }
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        protected void NotifyPropertyChanged(String propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }

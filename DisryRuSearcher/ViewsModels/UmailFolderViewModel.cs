@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiaryRuSearcher.ViewsModels
 {
-    class UmailFolderViewModel
+    public class UmailFolderViewModel
     {
         public string Name { get; set; }
         public Int64 Count { get; set; }

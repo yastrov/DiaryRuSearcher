@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace DiaryRuSearcher.ViewsModels
 {
-    class PostViewModel
+    public class PostViewModel: INotifyPropertyChanged
     {
         public string Avatar_path { get; set; }
         public string Author_title { get; set; }
@@ -152,6 +153,15 @@ namespace DiaryRuSearcher.ViewsModels
             post.Title = view.Title;
             post.Message_html = view.Message_html;
             return post;
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        protected void NotifyPropertyChanged(String propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }

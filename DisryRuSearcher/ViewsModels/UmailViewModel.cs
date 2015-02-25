@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiaryRuSearcher.ViewsModels
 {
-    class UmailViewModel
+    public class UmailViewModel
     {
         public string From_username { get; set; }
         public string Message_html { get; set; }

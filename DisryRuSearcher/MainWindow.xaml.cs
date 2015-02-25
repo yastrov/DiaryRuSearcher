@@ -18,26 +18,72 @@ using System.Collections.ObjectModel;
 using DiaryRuSearcher.ViewsModels;
 using DiaryAPI.JSONResponseClasses;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace DiaryRuSearcher
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private IProgress<Double> progress;
         private CancellationTokenSource cancelSource;
         private DiaryAPI.DiaryAPIClient diaryAPIClient = new DiaryAPIClient();
 
-        private static ObservableCollection<PostViewModel> postsCollection = null;
+        private ObservableCollection<PostViewModel> postsCollection = null;
         private ObservableCollection<CommentViewModel> commentsCollection = null;
         private ObservableCollection<UmailViewModel> umailsCollection = null;
         private ObservableCollection<UmailFolderViewModel> umailFoldersCollection = null;
 
+        #region Inotify
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        protected void NotifyPropertyChanged(String propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
+        #region DataBinding
+        public ObservableCollection<PostViewModel> PostsCollection
+        {
+            get { return postsCollection; }
+            set
+            {
+                postsCollection = value;
+                //It's important for DataBinding via WPF!
+                NotifyPropertyChanged("PostsCollection");
+            }
+        }
+        public ObservableCollection<CommentViewModel> CommentsCollection
+        {
+            get { return commentsCollection; }
+            set
+            {
+                commentsCollection = value;
+                //It's important for DataBinding via WPF!
+                NotifyPropertyChanged("CommentsCollection");
+            }
+        }
+        public ObservableCollection<UmailViewModel> UmailsCollection
+        {
+            get { return umailsCollection; }
+            set
+            {
+                umailsCollection = value;
+                //It's important for DataBinding via WPF!
+                NotifyPropertyChanged("UmailsCollection");
+            }
+        }
+        #endregion
+
         public MainWindow()
         {
             InitializeComponent();
+            //It's important for DataBinding via WPF!
+            //DataContext = this; // But we define it in MainWindow XAML
 #if DEBUG
             System.Windows.MessageBox.Show("Debug mode!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
 #else
@@ -105,24 +151,21 @@ namespace DiaryRuSearcher
         {
             string commentAuthor = commentAuthorTextBox.Text.Trim();
             string commentKeyWord = commentsKeywordTextBox.Text.Trim();
-            commentsCollection = new DiaryDataBase().GetCommentsByAuthorKeyword(commentAuthor, commentKeyWord);
-            commentsListView.ItemsSource = commentsCollection;
+            CommentsCollection = new DiaryDataBase().GetCommentsByAuthorKeyword(commentAuthor, commentKeyWord);
         }
         private void umailSearchButton_Click(object sender, RoutedEventArgs e)
         {
             string umailSender = umailSenderNameTextBox.Text.Trim();
             string umailKeyword = umailKeywordTextBox.Text.Trim();
             string umailTitle = umailTitleTextBox.Text.Trim();
-            umailsCollection = new DiaryDataBase().GetUmailsBySenderTitleKeyword(umailSender, umailTitle, umailKeyword);
-            umailsListView.ItemsSource = umailsCollection;
+            UmailsCollection = new DiaryDataBase().GetUmailsBySenderTitleKeyword(umailSender, umailTitle, umailKeyword);
         }
         private void postSearchButton_Click(object sender, RoutedEventArgs e)
         {
             string postTitle = postSearchTitleTextBox.Text.Trim();
             string postKeyword = postSearchKeywordTextBox.Text.Trim();
             string postAuthor = postSearchAuthorTextBox.Text.Trim();
-            postsCollection = new DiaryDataBase().GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
-            postsListView.ItemsSource = postsCollection;
+            PostsCollection = new DiaryDataBase().GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
         }
         #endregion
 

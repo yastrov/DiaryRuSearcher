@@ -88,7 +88,6 @@
                         <ColumnDefinition MaxWidth="110"/>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
-
                     </Grid.ColumnDefinitions>
                     <Label Content="Авторизация:" Grid.Row="0" Grid.Column="0"/>
                     <Label Content="Логин:" Grid.Row="1" Grid.Column="0"/>
@@ -98,18 +97,18 @@
                         <Button Name="cancelButton" Content="Прервать" Click="saverButton_Click" Width="145"/>
                     </StackPanel>
                     <PasswordBox Name="passwordBox" Grid.Row="2" Grid.Column="1" Password=""/>
-                    <TextBox Name="loginBox" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" Text=""/>
+                    <TextBox Text="{Binding UserName}" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap"/>
                     <GroupBox Header="Что требуется?" Grid.Column="2" Grid.Row="0" Grid.RowSpan="4">
                         <StackPanel Orientation="Vertical">
-                            <CheckBox Name="downloadPostsCheckBox" Content="Загрузить посты" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                            <CheckBox Name="downloadCommentsCheckBox" Content="Загрузить комменты" HorizontalAlignment="Left" ToolTip="Работает только при загрузке постов!"/>
-                            <CheckBox Name="downloadUmailsCheckBox" Content="Загрузить У-мылы" HorizontalAlignment="Left"/>
+                            <CheckBox IsChecked="{Binding IsDownloadPosts, Mode=TwoWay}" Content="Загрузить посты" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <CheckBox IsChecked="{Binding IsDownloadComments, Mode=TwoWay}" Content="Загрузить комменты" HorizontalAlignment="Left" ToolTip="Работает только при загрузке постов!"/>
+                            <CheckBox IsChecked="{Binding IsDownloadUmails, Mode=TwoWay}" Content="Загрузить У-мылы" HorizontalAlignment="Left"/>
                             <Label Content="Адрес дневника:"/>
-                            <TextBox Name="journalShortNameTextBox" TextWrapping="Wrap" Text="" ToolTip="Короткое имя (me), или адрес полностью: http://me.diary.ru"/>
+                            <TextBox Text="{Binding DiaryUrlForDownload}" TextWrapping="Wrap" ToolTip="Короткое имя (me), или адрес полностью: http://me.diary.ru"/>
                         </StackPanel>
                     </GroupBox>
 
-                    <ProgressBar Name="progressBar" Grid.Row="4" Maximum="1.0" Grid.ColumnSpan="3"/>
+                    <ProgressBar Value="{Binding ProgressPercent}" Grid.Row="4" Maximum="1.0" Grid.ColumnSpan="3"/>
 
                     <!--<ListView Name="umailFoldersListView" ItemTemplate="{StaticResource UmailFoldersDataTemplate}" Grid.ColumnSpan="2"  Grid.Row="0" Grid.Column="0" Margin="0,117,0,15" Grid.RowSpan="2">
                     </ListView>-->
@@ -195,21 +194,23 @@
                         <RowDefinition Height="31*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="87*"/>
-                        <ColumnDefinition Width="167*"/>
-                        <ColumnDefinition Width="127*"/>
-                        <ColumnDefinition Width="127*"/>
+                        <ColumnDefinition Width="21*"/>
+                        <ColumnDefinition Width="66*"/>
+                        <ColumnDefinition Width="28*"/>
+                        <ColumnDefinition Width="63*"/>
+                        <ColumnDefinition Width="74*"/>
+                        <ColumnDefinition Width="128*"/>
                     </Grid.ColumnDefinitions>
-                    <Label Content="Продукт:" Grid.Row="0" Grid.Column="0" Style="{StaticResource myAboutLabelStyle}" />
-                    <Label Content="Версия:" Grid.Row="1" Grid.Column="0" Style="{StaticResource myAboutLabelStyle}" />
-                    <Label Content="Copyright:" Grid.Row="2" Grid.Column="0" Style="{StaticResource myAboutLabelStyle}" />
+                    <Label Content="Продукт:" Grid.Row="0" Grid.Column="0" Style="{StaticResource myAboutLabelStyle}" Grid.ColumnSpan="2" />
+                    <Label Content="Версия:" Grid.Row="1" Grid.Column="0" Style="{StaticResource myAboutLabelStyle}" Grid.ColumnSpan="2" />
+                    <Label Content="Copyright:" Grid.Row="2" Grid.Column="0" Style="{StaticResource myAboutLabelStyle}" Grid.ColumnSpan="2" />
 
-                    <Label Name="productNameLabel" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"/>
-                    <Label Name="versionLabel" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" />
-                    <Label Name="copyrightLabel" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" />
+                    <Label Content="{Binding ProductName}" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="4"/>
+                    <Label Content="{Binding ProductVersion}" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="4" />
+                    <Label Content="{Binding ProductCopyright}" Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="4" />
 
-                    <Label Content="Описание:" Grid.Row="3" Grid.ColumnSpan="4" Style="{StaticResource myAboutLabelStyle}"/>
-                    <ScrollViewer Grid.Row="4" Grid.ColumnSpan="4"  Margin="1,1,1,1"
+                    <Label Content="Описание:" Grid.Row="3" Grid.ColumnSpan="7" Style="{StaticResource myAboutLabelStyle}"/>
+                    <ScrollViewer Grid.Row="4" Grid.ColumnSpan="7"  Margin="20,1"
                           HorizontalAlignment="Center" HorizontalContentAlignment="Center" Width="Auto">
                         <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" Width="auto">
                 Эта программа распространяется "как есть", под свободной лицензией (MIT License), автор не несёт ответственности за ваши действия или возможные проблемы появившиеся вследствии использования программы.<LineBreak/>
@@ -222,7 +223,7 @@
                 Используется: WPF, JSON.NET, SQLITE-NET.
                         </TextBlock>
                     </ScrollViewer>
-                    <Button Name="checkVersionButton" Content="Проверить новую версию" Click="checkVersionButton_Click" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"/>
+                    <Button Name="checkVersionButton" Content="Проверить новую версию" Click="checkVersionButton_Click" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5"/>
                 </Grid>
             </TabItem>
         </TabControl>

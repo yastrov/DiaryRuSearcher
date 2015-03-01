@@ -77,6 +77,89 @@ namespace DiaryRuSearcher
                 NotifyPropertyChanged("UmailsCollection");
             }
         }
+        private Double _progressPercent = 0.0;
+        public Double ProgressPercent
+        {
+            get { return _progressPercent; }
+            set
+            {
+                _progressPercent = value;
+                //It's important for DataBinding via WPF!
+                NotifyPropertyChanged("ProgressPercent");
+            }
+        }
+        #endregion
+        #region IsChecked Flags for DataBinding
+        private bool _isDownloadPosts = true;
+        public bool IsDownloadPosts
+        {
+            get { return _isDownloadPosts;}
+            set
+            {
+                _isDownloadPosts = value;
+                NotifyPropertyChanged("IsDownloadPosts");
+            }
+        }
+        private bool _isDownloadComments;
+        public bool IsDownloadComments
+        {
+            get { return _isDownloadComments; }
+            set
+            {
+                _isDownloadComments = value;
+                NotifyPropertyChanged("IsDownloadComments");
+            }
+        }
+        private bool _isDownloadUmails;
+        public bool IsDownloadUmails
+        {
+            get { return _isDownloadUmails; }
+            set
+            {
+                _isDownloadUmails = value;
+                NotifyPropertyChanged("IsDownloadUmails");
+            }
+        }
+        #endregion
+
+        #region Version Info fields for DataBind
+        public string ProductName
+        {
+            get { return AboutHelper.AssemblyProduct; }
+            set { ; }
+        }
+        public string ProductVersion
+        {
+            get { return AboutHelper.AssemblyVersion; }
+            set { ; }
+        }
+        public string ProductCopyright
+        {
+            get { return AboutHelper.AssemblyCopyright.Replace("Copyright ", String.Empty); }
+            set { ; }
+        }
+        #endregion
+        #region TextFields for DataBinding
+        private string _userName = string.Empty;
+        public string UserName
+        {
+            get { return _userName; }
+            set
+            {
+                _userName = value;
+                NotifyPropertyChanged("UserName");
+            }
+        }
+        private string _diaryUrlForDownload = string.Empty;
+        public string DiaryUrlForDownload
+        {
+            get { return _diaryUrlForDownload; }
+            set
+            {
+                _diaryUrlForDownload = value;
+                NotifyPropertyChanged("DiaryUrlForDownload");
+            }
+        }
         #endregion
 
         public MainWindow()
@@ -89,11 +172,6 @@ namespace DiaryRuSearcher
 #else
             checkNewVersion();
 #endif
-            #region About info load to About page
-            productNameLabel.Content = AboutHelper.AssemblyProduct;
-            versionLabel.Content = AboutHelper.AssemblyVersion;
-            copyrightLabel.Content = AboutHelper.AssemblyCopyright.Replace("Copyright ", String.Empty);
-            #endregion
         }
 
         #region Button clicks
@@ -107,18 +185,18 @@ namespace DiaryRuSearcher
             try
             {
                 await Auth();
-                if (downloadPostsCheckBox.IsChecked ?? false)
+                if (IsDownloadPosts)
                 {
-                    string journalShortname = journalShortNameTextBox.Text.Trim();
+                    string journalShortname = DiaryUrlForDownload.Trim();
                     if (!String.IsNullOrEmpty(journalShortname))
                     {
                         journalShortname = journalShortname.Replace("http://", String.Empty);
                         journalShortname = journalShortname.Replace("diary.ru", String.Empty);
                         journalShortname = journalShortname.Replace("/", String.Empty);
                     }
-                    await downloadPostsAndComments(journalShortname, downloadCommentsCheckBox.IsChecked ?? false);
+                    await downloadPostsAndComments(journalShortname, IsDownloadComments);
                 }
-                if (downloadUmailsCheckBox.IsChecked ?? false)
+                if (IsDownloadUmails)
                 {
                     await downloadUmails();
                 }
@@ -178,12 +256,12 @@ namespace DiaryRuSearcher
         #region for DiaryAPI
         async Task Auth()
         {
-            await diaryAPIClient.AuthSecureAsync(loginBox.Text.Trim(), passwordBox.SecurePassword);
+            await diaryAPIClient.AuthSecureAsync(UserName.Trim(), passwordBox.SecurePassword);
 
         }
         async private Task downloadPostsAndComments(string shortname, bool withComments)
         {
-            progress = new Progress<Double>(i => progressBar.Value = i);
+            progress = new Progress<Double>(i => ProgressPercent = i);
             cancelSource = new CancellationTokenSource();
 
             DiarySaverDB saver = new DiarySaverDB();
@@ -193,7 +271,7 @@ namespace DiaryRuSearcher
         }
         async private Task downloadUmailFolders()
         {
-            progress = new Progress<Double>(i => progressBar.Value = i);
+            progress = new Progress<Double>(i => ProgressPercent = i);
             cancelSource = new CancellationTokenSource();
             List<UmailFolderUnit> folders = await diaryAPIClient.UmailGetFoldersAsync();
             DiarySaverDB saver = new DiarySaverDB();
@@ -206,13 +284,10 @@ namespace DiaryRuSearcher
         async private Task downloadUmails()
         {
 
-            progress = new Progress<Double>(i => progressBar.Value = i);
+            progress = new Progress<Double>(i => ProgressPercent = i);
             cancelSource = new CancellationTokenSource();
-
             DiarySaverDB saver = new DiarySaverDB();
             await diaryAPIClient.AllUmailsGetInAllFoldersProcessingAsync(saver, progress, cancelSource.Token);
-
-
         }
 
         #endregion

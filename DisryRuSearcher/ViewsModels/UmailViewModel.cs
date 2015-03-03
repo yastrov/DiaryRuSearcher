@@ -26,6 +26,14 @@ namespace DiaryRuSearcher.ViewsModels
                 .Append(this.Umailid);
             return sb.ToString();
         }
+        public string Message
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(this.Message_html)) return this.Message_html;
+                return string.Empty;
+            }
+        }
         public string MessageForView
         {
             get

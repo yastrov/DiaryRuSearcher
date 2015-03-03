@@ -356,5 +356,50 @@ namespace DiaryRuSearcher
                 }
             }
         }
+
+        #region Sort in ListView
+        private void SortCM_Click(object sender, RoutedEventArgs e)
+        {
+            var s = sender as MenuItem;
+            switch (s.Name)
+            {
+                case "PostsAscendingByDate":
+                    PostsCollection = new ObservableCollection<PostViewModel>(PostsCollection.OrderBy(item => Convert.ToInt32(item.Dateline_date)));
+                    break;
+                case "PostsDescendingByDate":
+                    PostsCollection = new ObservableCollection<PostViewModel>(PostsCollection.OrderByDescending(item => Convert.ToInt32(item.Dateline_date)));
+                    break;
+                case "CommentsAscendingByDate":
+                    CommentsCollection = new ObservableCollection<CommentViewModel>(CommentsCollection.OrderBy(item => Convert.ToInt32(item.Dateline)));
+                    break;
+                case "CommentsDescendingByDate":
+                    CommentsCollection = new ObservableCollection<CommentViewModel>(CommentsCollection.OrderByDescending(item => Convert.ToInt32(item.Dateline)));
+                    break;
+                case "UmailsAscendingByDate":
+                    UmailsCollection = new ObservableCollection<UmailViewModel>(UmailsCollection.OrderBy(item => Convert.ToInt32(item.Dateline)));
+                    break;
+                case "UmailsDescendingByDate":
+                    UmailsCollection = new ObservableCollection<UmailViewModel>(UmailsCollection.OrderByDescending(item => Convert.ToInt32(item.Dateline)));
+                    break;
+            }
+        }
+
+        private void ReverseCollectionClick(object sender, RoutedEventArgs e)
+        {
+            var s = sender as GridViewColumnHeader;
+            switch (s.Name)
+            {
+                case "PostsReverse":
+                    PostsCollection = new ObservableCollection<PostViewModel>(PostsCollection.Reverse());
+                    break;
+                case "CommentsReverse":
+                    CommentsCollection = new ObservableCollection<CommentViewModel>(CommentsCollection.Reverse());
+                    break;
+                case "UmailsReverse":
+                    UmailsCollection = new ObservableCollection<UmailViewModel>(UmailsCollection.Reverse());
+                    break;
+            }
+        }
+        #endregion
     }
 }

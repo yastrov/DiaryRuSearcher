@@ -26,6 +26,15 @@ namespace DiaryRuSearcher.ViewsModels
         public string Postid { get; set; }
 
         public string Url { get { return this.MakeUrl(); } }
+        public string Message
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(this.Message_html)) return this.Message_html;
+                if (!string.IsNullOrEmpty(this.Message_src)) return this.Message_src;
+                return string.Empty;
+            }
+        }
 
         public string MakeUrl()
         {

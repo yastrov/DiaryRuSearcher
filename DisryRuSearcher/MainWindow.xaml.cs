@@ -88,6 +88,15 @@ namespace DiaryRuSearcher
                 NotifyPropertyChanged("ProgressPercent");
             }
         }
+        private DateTime _trashDate = DateTime.Now;
+        public DateTime TrashDate
+        {
+            get { return _trashDate; }
+            set {
+                _trashDate = value;
+                NotifyPropertyChanged("TrashDate");
+            }
+        }
         #endregion
         #region IsChecked Flags for DataBinding
         private bool _isDownloadPosts = true;
@@ -193,7 +202,7 @@ namespace DiaryRuSearcher
                     if (!String.IsNullOrEmpty(journalShortname))
                     {
                         journalShortname = journalShortname.Replace("http://", String.Empty);
-                        journalShortname = journalShortname.Replace("diary.ru", String.Empty);
+                        journalShortname = journalShortname.Replace(".diary.ru", String.Empty);
                         journalShortname = journalShortname.Replace("/", String.Empty);
                         await downloadPostsAndComments(journalShortname, IsDownloadComments);
                     }
@@ -215,7 +224,11 @@ namespace DiaryRuSearcher
             catch (OperationCanceledException ex)
             {
                 success = false;
-                MessageBox.Show("Прервано пользователем!", this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+                var sb = new StringBuilder();
+                sb.Append("Прервано пользователем!")
+                    .Append(Environment.NewLine)
+                    .Append("Скачанные материалы находятся в базе данных.");
+                MessageBox.Show(sb.ToString(), this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (DiaryAPIClientException ex)
             {
@@ -281,6 +294,8 @@ namespace DiaryRuSearcher
             cancelSource = new CancellationTokenSource();
 
             DiarySaverDB saver = new DiarySaverDB();
+            saver.BeforeDate = TrashDate;
+            saver.CancelTokenSourse = cancelSource;
             var journal = diaryAPIClient.JournalGet("", shortname);
             //In theoretical, you may pass "await" keyword and see the result:
             await diaryAPIClient.AllPostsGetProcessingAsync("diarytype", journal, withComments, saver, progress, cancelSource.Token);
@@ -291,6 +306,8 @@ namespace DiaryRuSearcher
             cancelSource = new CancellationTokenSource();
             List<UmailFolderUnit> folders = await diaryAPIClient.UmailGetFoldersAsync();
             DiarySaverDB saver = new DiarySaverDB();
+            saver.BeforeDate = TrashDate;
+            saver.CancelTokenSourse = cancelSource;
             foreach (var folder in folders)
             {
                 saver.InsertUmailFolder(folder);
@@ -303,6 +320,8 @@ namespace DiaryRuSearcher
             progress = new Progress<Double>(i => ProgressPercent = i);
             cancelSource = new CancellationTokenSource();
             DiarySaverDB saver = new DiarySaverDB();
+            saver.BeforeDate = TrashDate;
+            saver.CancelTokenSourse = cancelSource;
             await diaryAPIClient.AllUmailsGetInAllFoldersProcessingAsync(saver, progress, cancelSource.Token);
         }
 

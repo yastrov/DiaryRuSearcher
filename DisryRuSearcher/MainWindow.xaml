@@ -48,17 +48,21 @@
                     </StackPanel>
                     <PasswordBox Name="passwordBox" Grid.Row="2" Grid.Column="1" Password=""/>
                     <TextBox Text="{Binding UserName}" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap"/>
-                    <GroupBox Header="Что требуется?" Grid.Column="2" Grid.Row="0" Grid.RowSpan="4">
+                    <GroupBox Header="Что требуется?" Grid.Column="2" Grid.Row="0"
+                              Grid.RowSpan="5">
                         <StackPanel Orientation="Vertical">
                             <CheckBox IsChecked="{Binding IsDownloadPosts, Mode=TwoWay}" Content="Загрузить посты" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                             <CheckBox IsChecked="{Binding IsDownloadComments, Mode=TwoWay}" Content="Загрузить комменты" HorizontalAlignment="Left" ToolTip="Работает только при загрузке постов!"/>
                             <CheckBox IsChecked="{Binding IsDownloadUmails, Mode=TwoWay}" Content="Загрузить У-мылы" HorizontalAlignment="Left"/>
+                            <DatePicker SelectedDate="{Binding TrashDate,Mode=TwoWay}"
+                                        ToolTip="Выберите дату по которую загружать данные\n(будут загружены, опубликованные после)\nили оставьте без изменений (будут загружены все)"/>
                             <Label Content="Адрес дневника:"/>
                             <TextBox Text="{Binding DiaryUrlForDownload}" TextWrapping="Wrap" ToolTip="Короткое имя (me), или адрес полностью: http://me.diary.ru"/>
                         </StackPanel>
                     </GroupBox>
 
-                    <ProgressBar Value="{Binding ProgressPercent}" Grid.Row="4" Maximum="1.0" Grid.ColumnSpan="3"/>
+                    <ProgressBar Value="{Binding ProgressPercent}" Grid.Row="4" Maximum="1.0"
+                                 Grid.ColumnSpan="2"/>
 
                     <!--<ListView Name="umailFoldersListView" ItemTemplate="{StaticResource UmailFoldersDataTemplate}" Grid.ColumnSpan="2"  Grid.Row="0" Grid.Column="0" Margin="0,117,0,15" Grid.RowSpan="2">
                     </ListView>-->

@@ -121,6 +121,7 @@ namespace DiaryAPI
                     break;
                 i += Convert.ToInt64(count);
                 onProgressPercentChanged.Report(i / post_count);
+                cancellationToken.ThrowIfCancellationRequested();
             }
         }
         #endregion

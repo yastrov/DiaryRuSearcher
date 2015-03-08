@@ -182,6 +182,8 @@ namespace DiaryRuSearcher
         }
         async private Task processGoButtonClick()
         {
+            bool success = true;
+            this.Cursor = Cursors.Wait;
             try
             {
                 await Auth();
@@ -193,8 +195,17 @@ namespace DiaryRuSearcher
                         journalShortname = journalShortname.Replace("http://", String.Empty);
                         journalShortname = journalShortname.Replace("diary.ru", String.Empty);
                         journalShortname = journalShortname.Replace("/", String.Empty);
+                        await downloadPostsAndComments(journalShortname, IsDownloadComments);
                     }
-                    await downloadPostsAndComments(journalShortname, IsDownloadComments);
+                    else
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append("Пожалуйста, введите адрес дневника или сообщества!")
+                            .Append(Environment.NewLine)
+                            .Append("Данные не могут быть загружены!");
+                        System.Windows.MessageBox.Show(sb.ToString(), this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    
                 }
                 if (IsDownloadUmails)
                 {
@@ -203,19 +214,24 @@ namespace DiaryRuSearcher
             }
             catch (OperationCanceledException ex)
             {
+                success = false;
                 MessageBox.Show("Прервано пользователем!", this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (DiaryAPIClientException ex)
             {
+                success = false;
                 MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
+                success = false;
                 System.Windows.MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
+                this.Cursor = Cursors.Arrow;
                 goButton.IsEnabled = true;
+                if(success)
                 System.Windows.MessageBox.Show("Загрузка данных завершена!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }

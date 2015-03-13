@@ -24,23 +24,32 @@ namespace DiaryAPI
             nvc.Add("shortname", shortname);
             if (!String.IsNullOrEmpty(userid))
             nvc.Add("userid", userid);
-            string postString = string.Join("&", nvc.AllKeys.Where(_key =>
-                !string.IsNullOrWhiteSpace(nvc[_key]))
-                .Select(_key =>
-                    string.Format("{0}={1}", System.Net.WebUtility.UrlEncode(_key), System.Net.WebUtility.UrlEncode(nvc[_key]))));
-            using (HttpWebResponse response = this._Request(DiaryAPI_URL + "?" + postString, "GET", null))
+            var url = NameValueCollectionToUrlStringUrlEncoding(nvc);
+            using (HttpWebResponse response = this._Request(url, "GET", null))
             {
-                if (response.StatusCode != HttpStatusCode.OK)
-                    throw new WebException(response.StatusDescription);
-                using (Stream oStream = response.GetResponseStream())
-                {
-                    StreamReader reader = new StreamReader(oStream);
-                    var r = JsonConvert.DeserializeObject<JournalGetJSONResponse>(reader.ReadToEnd());
-                    return r.Journal;
-                }
+                var r = GetObjectFromJson<JournalGetJSONResponse>(response);
+                if (r.CheckForError()) throw new DiaryAPIClientException(r.Error);
+                return r.Journal;
             }
         }
 
-        
+        public async Task<JournalUnit> JournalGetAsync(string userid, string shortname)
+        {
+            NameValueCollection nvc = new NameValueCollection();
+
+            nvc.Add("method", "journal.get");
+            nvc.Add("sid", _sid);
+            if (!String.IsNullOrEmpty(shortname))
+                nvc.Add("shortname", shortname);
+            if (!String.IsNullOrEmpty(userid))
+                nvc.Add("userid", userid);
+            var url = NameValueCollectionToUrlStringUrlEncoding(nvc);
+            using (HttpWebResponse response = await this._RequestAsync(url, "GET", null))
+            {
+                var r = GetObjectFromJson<JournalGetJSONResponse>(response);
+                if (r.CheckForError()) throw new DiaryAPIClientException(r.Error);
+                return r.Journal;
+            }
+        }
     }
 }

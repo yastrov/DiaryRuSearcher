@@ -32,6 +32,18 @@ namespace DiaryAPI
             return sb.ToString();
         }
 
+        public string NameValueCollectionToUrlStringUrlEncoding(System.Collections.Specialized.NameValueCollection nvc)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(DiaryAPI_URL).Append("?");
+            var s = string.Join("&", nvc.AllKeys.Where(_key =>
+                !string.IsNullOrWhiteSpace(nvc[_key]))
+                .Select(_key =>
+                    string.Format("{0}={1}", System.Net.WebUtility.UrlEncode(_key), System.Net.WebUtility.UrlEncode(nvc[_key]))));
+            sb.Append(s);
+            return sb.ToString();
+        }
+
         #region encoding
         public string ConvertStringToWinString(string str)
         {
@@ -86,7 +98,14 @@ namespace DiaryAPI
             using (Stream oStream = response.GetResponseStream())
             {
                 StreamReader reader = new StreamReader(oStream);
-                return JsonConvert.DeserializeObject<T>(reader.ReadToEnd(), settings);
+                try
+                {
+                    return JsonConvert.DeserializeObject<T>(reader.ReadToEnd(), settings);
+                }
+                catch(JsonSerializationException exc)
+                {
+                    throw new DiaryAPIClientException(exc.ToString());
+                }
             }
         }
     }

@@ -387,9 +387,10 @@ namespace DiaryRuSearcher
                 }
                 catch (Exception ex)
                 {
-                    ;
+                    MessageBox.Show(ex.ToString(), Title, MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
+            base.OnClosing(e);
         }
 
         #region Sort in ListView

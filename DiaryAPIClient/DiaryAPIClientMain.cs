@@ -13,7 +13,7 @@ namespace DiaryAPI
         private const string appkey = ""; // ok
         private const string key = ""; // pk
         #endregion
-        private TimeSpan timeoutBetweenRequests = TimeSpan.FromMilliseconds(1000);
+        private TimeSpan timeoutBetweenRequests = TimeSpan.FromMilliseconds(3000);
         private string _sid;
         public string SID
         {

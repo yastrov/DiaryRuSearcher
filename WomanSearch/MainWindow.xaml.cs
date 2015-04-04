@@ -245,7 +245,7 @@ namespace WomanSearch
                                 if (!string.IsNullOrEmpty(user.AgeAsStr))
                                 {
                                     int age = Convert.ToInt32(user.AgeAsStr.Substring(0, 2), 10);
-                                    if ((age > 26) || (age < 18)) continue;
+                                    if ((age > 27) || (age < 18)) continue;
                                 }
                                 if (!String.IsNullOrEmpty(user.about))
                                 {
@@ -268,15 +268,23 @@ namespace WomanSearch
                                 }
                                 if (!flag) continue;
                                 result.Add(new WomanView(user));
+                                System.Diagnostics.Debug.WriteLine(string.Format("Visited: {0}", i));
                             }
                         }
                         catch (DiaryAPIClientException exc)
                         {
+                            System.Diagnostics.Debug.WriteLine("-------------------------------");
+                            System.Diagnostics.Debug.WriteLine(string.Format("Visited: {0}", i));
+                            System.Diagnostics.Debug.WriteLine(exc.ToString());
+                            System.Diagnostics.Debug.WriteLine("-------------------------------");
                             ;//MessageBox.Show(String.Format("{0}", i) + exc.Message);
                         }
                         catch (System.Net.WebException exc)
                         {
-                            ;
+                            System.Diagnostics.Debug.WriteLine("-------------------------------");
+                            System.Diagnostics.Debug.WriteLine(string.Format("Visited: {0}", i));
+                            System.Diagnostics.Debug.WriteLine(exc.ToString());
+                            System.Diagnostics.Debug.WriteLine("-------------------------------");
                         }
                         System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
                         cToken.ThrowIfCancellationRequested();

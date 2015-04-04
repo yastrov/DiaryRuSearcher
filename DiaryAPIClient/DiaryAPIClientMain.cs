@@ -14,6 +14,11 @@ namespace DiaryAPI
         private const string key = ""; // pk
         #endregion
         private TimeSpan timeoutBetweenRequests = TimeSpan.FromMilliseconds(1000);
+        public TimeSpan TimeoutBetweenRequests
+        {
+            get { return timeoutBetweenRequests; }
+            set { timeoutBetweenRequests = value; }
+        }
         private string _sid;
         public string SID
         {
@@ -41,6 +46,13 @@ namespace DiaryAPI
         {
             get { return _contentType; }
             set { _contentType = value; }
+        }
+
+        private System.Net.IWebProxy _proxy = null;
+        public System.Net.IWebProxy Proxy
+        {
+            get { return _proxy; }
+            set { _proxy = value; }
         }
 
         public DiaryAPIClient()

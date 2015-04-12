@@ -21,7 +21,8 @@ namespace DiaryAPI
         protected HttpWebResponse _Request(String requestMethod, byte[] content)
         {
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(DiaryAPI_URL);
-            request.ProtocolVersion = new Version(1, 0);
+            request.ProtocolVersion = HttpVersion.Version11;
+            request.KeepAlive = true;
             request.Method = requestMethod;
             if (_proxy != null)
                 request.Proxy = _proxy;
@@ -54,7 +55,8 @@ namespace DiaryAPI
         protected HttpWebResponse _Request(String url, String requestMethod, byte[] content)
         {
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
-            request.ProtocolVersion = new Version(1, 0);
+            request.ProtocolVersion = HttpVersion.Version11;
+            request.KeepAlive = true;
             request.Method = requestMethod;
             if (_proxy != null)
                 request.Proxy = _proxy;

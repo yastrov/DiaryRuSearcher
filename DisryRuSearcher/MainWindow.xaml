@@ -6,6 +6,7 @@
         WindowStartupLocation="CenterScreen" DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Window.Resources>
         <converter:HTMLToNewLineStringConverter x:Key="NLConverter"/>
+        <converter:TimeSpanToStringConverter x:Key="TimeSpanToString"/>
         <Style x:Key="myAboutLabelStyle" TargetType="{x:Type Label}">
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
@@ -43,12 +44,14 @@
                     <Label Content="Логин:" Grid.Row="1" Grid.Column="0"/>
                     <Label Content="Пароль:" Grid.Row="2" Grid.Column="0"/>
                     <StackPanel Orientation="Horizontal" Grid.Column="0"  Grid.Row="3" Grid.ColumnSpan="2">
-                        <Button Name="goButton" Content="Загрузить" Click="goButton_Click" Width="160"/>
+                        <Button Name="goButton" Content="Загрузить" Click="goButton_Click" Width="160"
+                                IsEnabled="{Binding IsImportantControlEnabled}"/>
                         <Button Name="cancelButton" Content="Прервать" Click="saverButton_Click" Width="145"/>
                     </StackPanel>
                     <PasswordBox Name="passwordBox" Grid.Row="2" Grid.Column="1" Password=""/>
                     <TextBox Text="{Binding UserName}" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap"/>
                     <GroupBox Header="Что требуется?" Grid.Column="2" Grid.Row="0"
+                              IsEnabled="{Binding IsImportantControlEnabled}"
                               Grid.RowSpan="5">
                         <StackPanel Orientation="Vertical">
                             <CheckBox IsChecked="{Binding IsDownloadPosts, Mode=TwoWay}" Content="Загрузить посты" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -214,6 +217,57 @@
                             </GridView>
                         </ListView.View>
                     </ListView>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Настройки">
+                <Grid Height="Auto" Width="Auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="35*"/>
+                        <RowDefinition Height="30*"/>
+                        <RowDefinition Height="28*"/>
+                        <RowDefinition Height="41*"/>
+                        <RowDefinition Height="28*" />
+                        <RowDefinition Height="376*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Настройки программы:"
+                           HorizontalContentAlignment="Center"
+                           Grid.Column="0"
+                           Grid.Row="0"
+                           Grid.ColumnSpan="2"/>
+                    <Label Content="Местоположение файла бызы данных:"
+                           HorizontalContentAlignment="Left"
+                           Grid.Column="0"
+                           Grid.Row="1"
+/>
+                    <DockPanel
+                                Grid.Column="1"
+                           Grid.Row="1">
+                        <TextBox DockPanel.Dock="Left"
+                                 ToolTip="Вы можете используя контекстное меню (правая кнопка мыши) выбрать или создать файл базы данных"
+                                 Text="{Binding DataBaseFilePath}">
+                            <TextBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Вырезать" Click="CutCommand"/>
+                                    <MenuItem Header="Копировать" Click="CopyCommand"/>
+                                    <MenuItem Header="Вставить" Click="PastCommand"/>
+                                    <MenuItem Header="Открыть диалог выбора файла" Click="GetFromFileDialogCommand"/>
+                                </ContextMenu>
+                            </TextBox.ContextMenu>
+                        </TextBox>
+                    </DockPanel>
+                    <Label Content="Tаймаут между запросами (милисек.):"
+                           ToolTip="Время (таймаут) между запросами (милисек.)"
+                           HorizontalContentAlignment="Left"
+                           Grid.Column="0"
+                           Grid.Row="2"/>
+                    <TextBox Grid.Column="1"
+                           Grid.Row="2"
+                             HorizontalContentAlignment="Center"
+                             Text="{Binding TimeoutBetweenRequests, Converter={StaticResource TimeSpanToString}}"/>
                 </Grid>
             </TabItem>
             <TabItem Header="О программе">

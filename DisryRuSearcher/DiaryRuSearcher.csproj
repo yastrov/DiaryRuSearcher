@@ -140,6 +140,7 @@
     </ApplicationDefinition>
     <Compile Include="AboutHelper.cs" />
     <Compile Include="Converters\HTMLToNewLineStringConverter.cs" />
+    <Compile Include="Converters\TimeSpanToTextConverter.cs" />
     <Compile Include="DiaryDataBase.cs" />
     <Compile Include="DiarySaverDB.cs" />
     <Compile Include="NewVersionChecker.cs" />

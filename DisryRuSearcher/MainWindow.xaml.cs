@@ -92,7 +92,8 @@ namespace DiaryRuSearcher
         public DateTime TrashDate
         {
             get { return _trashDate; }
-            set {
+            set
+            {
                 _trashDate = value;
                 NotifyPropertyChanged("TrashDate");
             }
@@ -102,7 +103,7 @@ namespace DiaryRuSearcher
         private bool _isDownloadPosts = true;
         public bool IsDownloadPosts
         {
-            get { return _isDownloadPosts;}
+            get { return _isDownloadPosts; }
             set
             {
                 _isDownloadPosts = value;
@@ -130,6 +131,16 @@ namespace DiaryRuSearcher
             }
         }
         #endregion
+        private bool _IsImportantControlEnabled = true;
+        public bool IsImportantControlEnabled
+        {
+            get { return _IsImportantControlEnabled; }
+            set
+            {
+                _IsImportantControlEnabled = value;
+                NotifyPropertyChanged("IsImportantControlEnabled");
+            }
+        }
 
         #region Version Info fields for DataBind
         public string ProductName
@@ -186,7 +197,7 @@ namespace DiaryRuSearcher
         #region Button clicks
         async private void goButton_Click(object sender, RoutedEventArgs e)
         {
-            goButton.IsEnabled = false;
+            IsImportantControlEnabled = false;
             await processGoButtonClick();
         }
         async private Task processGoButtonClick()
@@ -196,6 +207,7 @@ namespace DiaryRuSearcher
             try
             {
                 await Auth();
+                diaryAPIClient.TimeoutBetweenRequests = TimeoutBetweenRequests;
                 if (IsDownloadPosts)
                 {
                     string journalShortname = DiaryUrlForDownload.Trim();
@@ -214,7 +226,7 @@ namespace DiaryRuSearcher
                             .Append("Данные не могут быть загружены!");
                         System.Windows.MessageBox.Show(sb.ToString(), this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
                     }
-                    
+
                 }
                 if (IsDownloadUmails)
                 {
@@ -243,9 +255,9 @@ namespace DiaryRuSearcher
             finally
             {
                 this.Cursor = Cursors.Arrow;
-                goButton.IsEnabled = true;
-                if(success)
-                System.Windows.MessageBox.Show("Загрузка данных завершена!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                IsImportantControlEnabled = true;
+                if (success)
+                    System.Windows.MessageBox.Show("Загрузка данных завершена!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
         private void saverButton_Click(object sender, RoutedEventArgs e)
@@ -437,5 +449,76 @@ namespace DiaryRuSearcher
             }
         }
         #endregion
+        #region options
+        private TimeSpan timeoutBetweenRequests = TimeSpan.FromMilliseconds(2000);
+        public TimeSpan TimeoutBetweenRequests
+        {
+            get { return timeoutBetweenRequests; }
+            set
+            {
+                timeoutBetweenRequests = value;
+                NotifyPropertyChanged("TimeoutBetweenRequests");
+            }
+        }
+        private string dataBaseFilePath = DiaryDataBase.DataBasePath;
+        public string DataBaseFilePath
+        {
+            get { return dataBaseFilePath; }
+            set
+            {
+                DiaryDataBase.DataBasePath = value;
+                // Неявная проверка
+                dataBaseFilePath = DiaryDataBase.DataBasePath;
+                NotifyPropertyChanged("DataBaseFilePath");
+            }
+        }
+        #endregion
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            GetFromFileDialogCommand();
+        }
+
+        private void CutCommand(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(DataBaseFilePath);
+            DataBaseFilePath = string.Empty;
+        }
+
+        private void PastCommand(object sender, RoutedEventArgs e)
+        {
+            DataBaseFilePath = Clipboard.GetText();
+        }
+        private void CopyCommand(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(DataBaseFilePath);
+        }
+
+        private void GetFromFileDialogCommand(object sender, RoutedEventArgs e)
+        {
+            GetFromFileDialogCommand();
+        }
+
+        private void GetFromFileDialogCommand()
+        {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.DefaultExt = ".sqlt";
+            dlg.Filter = "Diary DataBase (*.sqlt)|*.txt|All Files|*.*";
+            dlg.Title = "Выберите файл для хранения базы данных:";
+            if (!string.IsNullOrEmpty(DataBaseFilePath))
+            {
+                dlg.InitialDirectory = System.IO.Path.GetDirectoryName(DataBaseFilePath);
+            }
+            else
+            {
+                dlg.InitialDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
+            }
+
+            Nullable<bool> result = dlg.ShowDialog();
+            if (result == true)
+            {
+                DataBaseFilePath = dlg.FileName;
+            }
+        }
     }
 }

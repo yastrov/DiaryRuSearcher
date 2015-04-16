@@ -13,9 +13,24 @@ namespace DiaryRuSearcher
 {
     class DiaryDataBase
     {
-        protected string DBPath = Path.Combine(
+        private static string defaultDBName = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             "DiarySearchDB.sqlt");
+        private static string DBPath = defaultDBName;
+        public static string DataBasePath {
+            get { return DBPath; }
+            set
+            {
+                if (Uri.IsWellFormedUriString(value, UriKind.RelativeOrAbsolute))
+                {
+                    DBPath = value;
+                }
+                else
+                {
+                    DBPath = defaultDBName;
+                }
+            }
+    }
         public DiaryDataBase()
         {
             createTables();
@@ -23,7 +38,7 @@ namespace DiaryRuSearcher
 
         protected void createTables()
         {
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 // Create the tables if they don't exist
                 db.CreateTable<DiaryAPI.JSONResponseClasses.UmailFolderUnit>();
@@ -37,7 +52,7 @@ namespace DiaryRuSearcher
         public PostViewModel GetPost(string postId)
         {
             PostViewModel post;
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 var _post = (db.Table<PostUnit>().Where(
                     p => p.Postid.Equals(postId))).Single();
@@ -49,7 +64,7 @@ namespace DiaryRuSearcher
         public ObservableCollection<PostViewModel> GetPosts()
         {
             var posts = new ObservableCollection<PostViewModel>();
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 var query = db.Table<PostUnit>().OrderBy(c => c.Dateline_cdate);
                 foreach (var _post in query)
@@ -63,14 +78,14 @@ namespace DiaryRuSearcher
 
         public int InsertPost(PostUnit post)
         {
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
                 return db.Insert(post);
         }
 
         public string SavePost(PostViewModel post)
         {
             string result = string.Empty;
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 string change = string.Empty;
                 try
@@ -101,14 +116,14 @@ namespace DiaryRuSearcher
         public int InsertComment(CommentUnit comment)
         {
             int result = 0;
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
                 result = db.Insert(comment);
             return result;
         }
         public CommentViewModel GetComment(string commentId)
         {
             CommentViewModel comment;
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 var _comment = (db.Table<CommentUnit>().Where(
                     p => p.Commentid.Equals(commentId))).Single();
@@ -119,7 +134,7 @@ namespace DiaryRuSearcher
         public ObservableCollection<CommentViewModel> GetComments()
         {
             var comments = new ObservableCollection<CommentViewModel>();
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 var query = db.Table<CommentUnit>().OrderByDescending(c => c.Commentid);
                 foreach (var _comment in query)
@@ -135,14 +150,14 @@ namespace DiaryRuSearcher
         public int InsertUmail(UmailUnit umail)
         {
             int result = 0;
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
                 result = db.Insert(umail);
             return result;
         }
         public UmailViewModel GetUmail(string commentId)
         {
             UmailViewModel comment;
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 var _comment = (db.Table<UmailUnit>().Where(
                     p => p.Umailid.Equals(commentId))).Single();
@@ -154,7 +169,7 @@ namespace DiaryRuSearcher
         public ObservableCollection<UmailViewModel> GetUmails()
         {
             var comments = new ObservableCollection<UmailViewModel>();
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 var query = db.Table<UmailUnit>().OrderByDescending(c => c.Umailid);
                 foreach (var _comment in query)
@@ -171,14 +186,14 @@ namespace DiaryRuSearcher
         public int InsertUmailFolder(DiaryAPI.JSONResponseClasses.UmailFolderUnit umail)
         {
             int result = 0;
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
                 result = db.Insert(umail);
             return result;
         }
         public UmailFolderViewModel GetUmailFolder(string folderId)
         {
             UmailFolderViewModel folder;
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 var _folder = (db.Table<UmailFolderUnit>().Where(
                     p => p.Folderid.Equals(folderId))).Single();
@@ -190,7 +205,7 @@ namespace DiaryRuSearcher
         public ObservableCollection<UmailFolderViewModel> GetUmailFolders()
         {
             var folders = new ObservableCollection<UmailFolderViewModel>();
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 var query = db.Table<UmailFolderUnit>().OrderByDescending(c => c.Folderid);
                 foreach (var _folder in query)
@@ -207,7 +222,7 @@ namespace DiaryRuSearcher
         public ObservableCollection<CommentViewModel> GetCommentsByAuthorKeyword(string commentAuthor, string commentKeyWord)
         {
             var result = new ObservableCollection<CommentViewModel>();
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 if (!string.IsNullOrEmpty(commentAuthor))
                 {
@@ -235,7 +250,7 @@ namespace DiaryRuSearcher
         public ObservableCollection<UmailViewModel> GetUmailsBySenderTitleKeyword(string umailSender, string title, string umailKeyword)
         {
             var result = new ObservableCollection<UmailViewModel>();
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 if (!string.IsNullOrEmpty(umailSender))
                 {
@@ -273,7 +288,7 @@ namespace DiaryRuSearcher
         public ObservableCollection<PostViewModel> GetPostsByAuthorTitleKeyword(string postAuthor, string postTitle, string postKeyword)
         {
             var result = new ObservableCollection<PostViewModel>();
-            using (var db = new SQLite.SQLiteConnection(this.DBPath))
+            using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 if (!string.IsNullOrEmpty(postAuthor))
                 {

@@ -17,6 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using DiaryAPI;
 using DiaryAPI.JSONResponseClasses;
+using System.Diagnostics;
 
 namespace WomanSearch
 {
@@ -267,6 +268,9 @@ namespace WomanSearch
                                         flag = true;
                                 }
                                 if (!flag) continue;
+                                var journal = diaryAPIClient.JournalGet(user.userid, null);
+                                if (journal != null)
+                                    if (DateTimeValue(journal.Last_post) < dTime) continue;
                                 result.Add(new WomanView(user));
                                 System.Diagnostics.Debug.WriteLine(string.Format("Visited: {0}", i));
                             }
@@ -329,6 +333,136 @@ namespace WomanSearch
             var maximal = Math.Max(a, b);
             FromUser = String.Format("{0}", minimal);
             ToUser = String.Format("{0}", minimal - 5000);
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            bool success = true;
+            this.Cursor = Cursors.Wait;
+            List<WomanView> list = null;
+
+            cancelSource = new CancellationTokenSource();
+            try
+            {
+                await Auth();
+                list = await downloadUsersFrom("57517", cancelSource.Token);
+            }
+            catch (OperationCanceledException ex)
+            {
+                success = false;
+                var sb = new StringBuilder();
+                sb.Append("Прервано пользователем!")
+                    .Append(Environment.NewLine)
+                    .Append("Скачанные материалы находятся в базе данных.");
+                MessageBox.Show(sb.ToString(), this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (DiaryAPI.DiaryAPIClientException ex)
+            {
+                success = false;
+                MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            //catch (Exception ex)
+            //{
+            //    success = false;
+            //    System.Windows.MessageBox.Show(ex.ToString(), this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
+            finally
+            {
+                if (list != null)
+                {
+                    Womans = new ObservableCollection<WomanView>(list);
+                }
+                this.Cursor = Cursors.Arrow;
+                goButton.IsEnabled = true;
+                if (success)
+                    System.Windows.MessageBox.Show("Загрузка данных завершена!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        async private Task<List<WomanView>> downloadUsersFrom(string from, CancellationToken cToken)
+        {
+
+            return await Task.Run(() =>
+            {
+                var result = new List<WomanView>();
+                try
+                {
+                    UserUnit muser = diaryAPIClient.UserGet(from);
+                    Debug.WriteLine(muser.username);
+                    foreach (var pair in muser.Readers2)
+                    {
+                        Debug.WriteLine(pair.Key);
+                        try
+                        {
+                            UserUnit user = diaryAPIClient.UserGet(String.Format("{0}", pair.Key));
+
+                            if (!String.IsNullOrEmpty(user.sex))
+                                if (user.sex.Equals("Мужской")) continue;
+                            if (user.journal.Equals("0"))
+                                continue;
+                            if (true)//(user.sex.Equals("Женский"))
+                            {
+                                if (!string.IsNullOrEmpty(user.AgeAsStr))
+                                {
+                                    int age = Convert.ToInt32(user.AgeAsStr.Substring(0, 2), 10);
+                                    if ((age > 27) || (age < 18)) continue;
+                                }
+                                if (!String.IsNullOrEmpty(user.about))
+                                {
+                                    var about = user.about.ToLower();
+                                    if (about.Contains("замужем")) continue;
+                                    if (about.Contains("есть дочка")) continue;
+                                    if (about.Contains("растёт дочка")) continue;
+                                    if (about.Contains("есть сын")) continue;
+                                    if (about.Contains("растёт сын")) continue;
+                                    if (about.Contains("есть муж")) continue;
+                                }
+                                //if (!user.city.Equals("Москва") && !user.region.Equals("Московская область"))
+                                //    continue;
+                                bool flag = false;
+                                if (user.interest == null) continue;
+                                foreach (var item in user.interest)
+                                {
+                                    if (item.Value.ToLower().Contains("программ"))
+                                        flag = true;
+                                }
+                                if (!flag) continue;
+                                var journal = diaryAPIClient.JournalGet(user.userid, null);
+                                if (journal != null)
+                                    if (DateTimeValue(journal.Last_post) < dTime) continue;
+                                result.Add(new WomanView(user));
+                            }
+                        }
+                        catch (DiaryAPIClientException exc)
+                        {
+                            Debug.WriteLine(String.Format("{0}", pair.Key) + exc.Message);
+                        }
+                        catch (System.Net.WebException exc)
+                        {
+                            Debug.WriteLine(exc.ToString());
+                        }
+                        Debug.WriteLine(String.Format("Visited: {0}", pair.Key));
+                        System.Threading.Thread.Sleep(this.timeoutBetweenRequests);
+                        cToken.ThrowIfCancellationRequested();
+                    }
+                }
+                catch (Exception ex)
+                { ;}
+                return result;
+                //In theoretical, you may pass "await" keyword and see the result:
+            }, cToken);
+        }
+
+        private DateTime dTime = new DateTime(2013, 1, 1);
+        public static DateTime DateTimeValue(string date)
+        {
+            return ConvertFromUnixTimestamp(Convert.ToDouble(date));
+        }
+
+        public static DateTime ConvertFromUnixTimestamp(double timestamp)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return origin.AddSeconds(timestamp);
         }
     }
 }

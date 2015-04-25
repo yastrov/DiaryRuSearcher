@@ -34,6 +34,7 @@
                     Width="145"/>
             <Button Content="Пересчитать" Click="recalcButton_Click"
                     Width="145"/>
+            <Button Content="Progr" Click="Button_Click"/>
         </StackPanel>
         <PasswordBox Name="passwordBox" Grid.Row="2" Grid.Column="1" Password=""/>
         <TextBox Text="{Binding UserName, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap"/>

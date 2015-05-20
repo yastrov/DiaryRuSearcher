@@ -38,9 +38,7 @@ namespace DiaryAPI.JSONResponseClasses
         [JsonProperty("yo")]
         public string AgeAsStr { get; set; }
         public string journal_title { get; set; }
-        [SQLite.PrimaryKey]
         public string userid { get; set; }
-        [SQLite.Ignore]
         public Dictionary<int, String> Readers2 { get; set; }
         public string city { get; set; }
         public string[] readers { get; set; }
@@ -48,7 +46,6 @@ namespace DiaryAPI.JSONResponseClasses
         public string shortname { get; set; }
         [JsonProperty("community.member")]
         public string[] communitymember { get; set; }
-        [SQLite.Ignore]
         [JsonProperty("community.member2")]
         public Dictionary<int, String> communitymember2 { get; set; }
         public string[] fav { get; set; }
@@ -59,15 +56,12 @@ namespace DiaryAPI.JSONResponseClasses
         public string joindate2 { get; set; }
         public string locked { get; set; }
         public int favs_count { get; set; }
-        [SQLite.Ignore]
         public Dictionary<int, String> favs2 { get; set; }
         public string education { get; set; }
         public string birthday2 { get; set; }
-        [SQLite.Ignore]
         public Dictionary<int, String> interest { get; set; }
         public string region { get; set; }
 
-        [SQLite.Ignore]
         public string Url { get { return this.MakeUrl(); } }
         public string MakeUrl()
         {

@@ -40,7 +40,6 @@ namespace DiaryAPI.JSONResponseClasses
         public string Read { get; set; }
         public string Dateline { get; set; }
         public string Title { get; set; }
-        [SQLite.PrimaryKey]
         public string Umailid { get; set; }
         public string From_userid { get; set; }
         public string No_smilies { get; set; }
@@ -79,7 +78,6 @@ namespace DiaryAPI.JSONResponseClasses
     {
         public string Name { get; set; }
         public Int64 Count { get; set; }
-        [SQLite.PrimaryKey]
         public string Folderid { get; set; }
     }
 }

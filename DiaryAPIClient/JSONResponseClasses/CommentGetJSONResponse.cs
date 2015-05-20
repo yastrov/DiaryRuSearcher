@@ -40,7 +40,6 @@ namespace DiaryAPI.JSONResponseClasses
         public string Author_shortname { get; set; }
         public string Author_avatar { get; set; }
         public string Author_username { get; set; }
-        [SQLite.PrimaryKey]
         public string Commentid { get; set; }
         public string Dateline { get; set; }
         public string Author_userid { get; set; }

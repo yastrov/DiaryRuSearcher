@@ -27,6 +27,8 @@ namespace DiaryRuSearcher
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private DiaryDataBase _diaryDataBase;
+
         private IProgress<Double> progress;
         private CancellationTokenSource cancelSource;
         private DiaryAPI.DiaryAPIClient diaryAPIClient = new DiaryAPIClient();
@@ -192,6 +194,8 @@ namespace DiaryRuSearcher
 #else
             checkNewVersion();
 #endif
+            _diaryDataBase = new DiaryDataBase();
+            BaseViewModel.SetDataBase(_diaryDataBase);
         }
 
         #region Button clicks
@@ -270,21 +274,21 @@ namespace DiaryRuSearcher
         {
             string commentAuthor = commentAuthorTextBox.Text.Trim();
             string commentKeyWord = commentsKeywordTextBox.Text.Trim();
-            CommentsCollection = new DiaryDataBase().GetCommentsByAuthorKeyword(commentAuthor, commentKeyWord);
+            CommentsCollection = _diaryDataBase.GetCommentsByAuthorKeyword(commentAuthor, commentKeyWord);
         }
         private void umailSearchButton_Click(object sender, RoutedEventArgs e)
         {
             string umailSender = umailSenderNameTextBox.Text.Trim();
             string umailKeyword = umailKeywordTextBox.Text.Trim();
             string umailTitle = umailTitleTextBox.Text.Trim();
-            UmailsCollection = new DiaryDataBase().GetUmailsBySenderTitleKeyword(umailSender, umailTitle, umailKeyword);
+            UmailsCollection = _diaryDataBase.GetUmailsBySenderTitleKeyword(umailSender, umailTitle, umailKeyword);
         }
         private void postSearchButton_Click(object sender, RoutedEventArgs e)
         {
             string postTitle = postSearchTitleTextBox.Text.Trim();
             string postKeyword = postSearchKeywordTextBox.Text.Trim();
             string postAuthor = postSearchAuthorTextBox.Text.Trim();
-            PostsCollection = new DiaryDataBase().GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
+            PostsCollection = _diaryDataBase.GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
         }
         #endregion
 
@@ -322,7 +326,7 @@ namespace DiaryRuSearcher
             saver.CancelTokenSourse = cancelSource;
             foreach (var folder in folders)
             {
-                saver.InsertUmailFolder(folder);
+                ;//saver.InsertUmailFolder(folder);
             }
 
         }

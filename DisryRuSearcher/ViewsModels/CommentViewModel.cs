@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DiaryRuSearcher.StoreModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DiaryRuSearcher.ViewsModels
 {
-    public class CommentViewModel: INotifyPropertyChanged
+    public class CommentViewModel : BaseViewModel
     {
         public string Can_edit { get; set; }
         public string Author_title { get; set; }
@@ -38,10 +39,13 @@ namespace DiaryRuSearcher.ViewsModels
 
         public string MakeUrl()
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("http://").Append(this.Author_shortname)
-            .Append(".diary.ru/p").Append(this.Postid)
-            .Append(".htm#").Append(this.Commentid);
+            System.Diagnostics.Debug.WriteLine(String.Format("Post Id: {0}", this.Postid));
+            var post = _diaryDataBase.GetPost(this.Postid);
+            if (post == null)
+                return String.Empty;
+            System.Diagnostics.Debug.WriteLine(String.Format("Post: {0}", post.ToString()));
+            StringBuilder sb = new StringBuilder(post.Url);
+            sb.Append("#").Append(this.Commentid);
             return sb.ToString();
         }
 
@@ -91,13 +95,24 @@ namespace DiaryRuSearcher.ViewsModels
             this.Message_src = comment.Message_src;
             this.Postid = comment.Postid;
         }
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(String propertyName)
+
+        public CommentViewModel(CommentStoreModel comment)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
+            this.Author_avatar = comment.Author_avatar;
+            this.Author_jtype = comment.Author_jtype;
+            this.Author_shortname = comment.Author_shortname;
+            this.Author_title = comment.Author_title;
+            this.Author_userid = comment.Author_userid;
+            this.Author_username = comment.Author_username;
+            this.Can_delete = comment.Can_delete;
+            this.Can_edit = comment.Can_edit;
+            this.Commentid = comment.Commentid;
+            this.Dateline = comment.Dateline;
+            this.Message_html = comment.Message_html;
+            this.Message_src = comment.Message_src;
+            this.Postid = comment.Postid;
         }
+
+        
     }
 }

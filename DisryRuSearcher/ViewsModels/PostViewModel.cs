@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using DiaryRuSearcher.StoreModel;
 
 namespace DiaryRuSearcher.ViewsModels
 {
-    public class PostViewModel: INotifyPropertyChanged
+    public class PostViewModel : BaseViewModel
     {
         public string Avatar_path { get; set; }
         public string Author_title { get; set; }
@@ -125,6 +126,34 @@ namespace DiaryRuSearcher.ViewsModels
             this.Message_html = post.Message_html;
         }
 
+        public PostViewModel(PostStoreModel post)
+        {
+            this.Access = post.Access;
+            this.Author_shortname = post.Shortname;
+            this.Author_title = post.Author_title;
+            this.Author_userid = post.Author_userid;
+            this.Author_username = post.Author_username;
+            this.Avatar_path = post.Avatar_path;
+            this.Avatarid = post.Avatarid;
+            this.Can_edit = post.Can_edit;
+            this.Close_access_mode = post.Close_access_mode;
+            this.Close_access_mode2 = post.Close_access_mode2;
+            this.Comments_count_data = post.Comments_count_data;
+            this.Dateline_cdate = post.Dateline_cdate;
+            this.Dateline_date = post.Dateline_date;
+            this.Jaccess = post.Jaccess;
+            this.Juserid = post.Juserid;
+            this.Message_src = post.Message_src;
+            this.No_comments = post.No_comments;
+            this.No_smile = post.No_smile;
+            this.Postid = post.Postid;
+            this.Shortname = post.Shortname;
+            this.Subscribed = post.Subscribed;
+            //this.Tags_data = post.Tags_data;
+            this.Title = post.Title;
+            this.Message_html = post.Message_html;
+        }
+
         public static DiaryAPI.JSONResponseClasses.PostUnit ModelFromView(PostViewModel view)
         {
             var post = new DiaryAPI.JSONResponseClasses.PostUnit();
@@ -153,15 +182,6 @@ namespace DiaryRuSearcher.ViewsModels
             post.Title = view.Title;
             post.Message_html = view.Message_html;
             return post;
-        }
-
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(String propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
         }
     }
 }

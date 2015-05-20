@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DiaryRuSearcher.StoreModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DiaryRuSearcher.ViewsModels
 {
-    public class UmailViewModel
+    public class UmailViewModel : BaseViewModel
     {
         public string From_username { get; set; }
         public string Message_html { get; set; }
@@ -60,6 +61,18 @@ namespace DiaryRuSearcher.ViewsModels
         }
 
         public UmailViewModel(DiaryAPI.JSONResponseClasses.UmailUnit umail)
+        {
+            this.From_username = umail.From_username;
+            this.Message_html = umail.Message_html;
+            this.Read = umail.Read;
+            this.Dateline = umail.Dateline;
+            this.Title = umail.Title;
+            this.Umailid = umail.Umailid;
+            this.From_userid = umail.From_userid;
+            this.No_smilies = umail.No_smilies;
+        }
+
+        public UmailViewModel(UmailStoreModel umail)
         {
             this.From_username = umail.From_username;
             this.Message_html = umail.Message_html;

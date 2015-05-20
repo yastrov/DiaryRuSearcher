@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DiaryAPI.JSONResponseClasses;
 using System.IO;
 using DiaryRuSearcher.ViewsModels;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using DiaryRuSearcher.StoreModel;
 
 namespace DiaryRuSearcher
 {
-    class DiaryDataBase
+    public class DiaryDataBase
     {
         private static string defaultDBName = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-            "DiarySearchDB.sqlt");
+            "DiarySearchDB.db");
         private static string DBPath = defaultDBName;
         public static string DataBasePath {
             get { return DBPath; }
@@ -41,22 +41,29 @@ namespace DiaryRuSearcher
             using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 // Create the tables if they don't exist
-                db.CreateTable<DiaryAPI.JSONResponseClasses.UmailFolderUnit>();
-                db.CreateTable<DiaryAPI.JSONResponseClasses.UmailUnit>();
-                db.CreateTable<DiaryAPI.JSONResponseClasses.PostUnit>();
-                db.CreateTable<DiaryAPI.JSONResponseClasses.CommentUnit>();
+                db.CreateTable<UmailStoreModel>();
+                db.CreateTable<PostStoreModel>();
+                db.CreateTable<CommentStoreModel>();
             }
         }
 
         #region Posts
         public PostViewModel GetPost(string postId)
         {
-            PostViewModel post;
-            using (var db = new SQLite.SQLiteConnection(DBPath))
+            PostViewModel post=null;
+            try
             {
-                var _post = (db.Table<PostUnit>().Where(
-                    p => p.Postid.Equals(postId))).Single();
-                post = new PostViewModel(_post);
+                using (var db = new SQLite.SQLiteConnection(DBPath))
+                {
+                    var _post = (db.Table<PostStoreModel>().Where(
+                        p => p.Postid.Equals(postId))).Single();
+                    if(_post != null)
+                    post = new PostViewModel(_post);
+                }
+            }
+            catch(Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
             }
             return post;
         }
@@ -66,7 +73,7 @@ namespace DiaryRuSearcher
             var posts = new ObservableCollection<PostViewModel>();
             using (var db = new SQLite.SQLiteConnection(DBPath))
             {
-                var query = db.Table<PostUnit>().OrderBy(c => c.Dateline_cdate);
+                var query = db.Table<PostStoreModel>().OrderBy(c => c.Dateline_cdate);
                 foreach (var _post in query)
                 {
                     var unit = new PostViewModel(_post);
@@ -76,10 +83,19 @@ namespace DiaryRuSearcher
             return posts;
         }
 
-        public int InsertPost(PostUnit post)
+        public int InsertPost(PostStoreModel post)
         {
+            int result = -1;
             using (var db = new SQLite.SQLiteConnection(DBPath))
-                return db.Insert(post);
+            {
+                var existingPost = db.Table<PostStoreModel>().Where(
+                       p => p.Postid.Equals(post.Postid)).SingleOrDefault();
+                if (existingPost == null)
+                {
+                    result = db.Insert(post);
+                }
+            }
+            return result;
         }
 
         public string SavePost(PostViewModel post)
@@ -90,7 +106,7 @@ namespace DiaryRuSearcher
                 string change = string.Empty;
                 try
                 {
-                    var existingPost = db.Table<PostUnit>().Where(
+                    var existingPost = db.Table<PostStoreModel>().Where(
                         p => p.Postid.Equals(post.Postid)).SingleOrDefault();
 
                     if (existingPost != null)
@@ -113,11 +129,18 @@ namespace DiaryRuSearcher
         #endregion
 
         #region Comment
-        public int InsertComment(CommentUnit comment)
+        public int InsertComment(CommentStoreModel comment)
         {
             int result = 0;
             using (var db = new SQLite.SQLiteConnection(DBPath))
-                result = db.Insert(comment);
+            {
+                var existingC = db.Table<CommentStoreModel>().Where(
+                       p => p.Commentid.Equals(comment.Commentid)).SingleOrDefault();
+                if (existingC == null)
+                {
+                    result = db.Insert(comment);
+                }
+            }
             return result;
         }
         public CommentViewModel GetComment(string commentId)
@@ -125,7 +148,7 @@ namespace DiaryRuSearcher
             CommentViewModel comment;
             using (var db = new SQLite.SQLiteConnection(DBPath))
             {
-                var _comment = (db.Table<CommentUnit>().Where(
+                var _comment = (db.Table<CommentStoreModel>().Where(
                     p => p.Commentid.Equals(commentId))).Single();
                 comment = new CommentViewModel(_comment);
             }
@@ -136,7 +159,7 @@ namespace DiaryRuSearcher
             var comments = new ObservableCollection<CommentViewModel>();
             using (var db = new SQLite.SQLiteConnection(DBPath))
             {
-                var query = db.Table<CommentUnit>().OrderByDescending(c => c.Commentid);
+                var query = db.Table<CommentStoreModel>().OrderByDescending(c => c.Commentid);
                 foreach (var _comment in query)
                 {
                     var unit = new CommentViewModel(_comment);
@@ -147,11 +170,18 @@ namespace DiaryRuSearcher
         }
         #endregion
         #region Umail
-        public int InsertUmail(UmailUnit umail)
+        public int InsertUmail(UmailStoreModel umail)
         {
             int result = 0;
             using (var db = new SQLite.SQLiteConnection(DBPath))
-                result = db.Insert(umail);
+            {
+                var existingU = db.Table<UmailStoreModel>().Where(
+                       p => p.Umailid.Equals(umail.Umailid)).SingleOrDefault();
+                if (existingU == null)
+                {
+                    result = db.Insert(umail);
+                }
+            }
             return result;
         }
         public UmailViewModel GetUmail(string commentId)
@@ -159,7 +189,7 @@ namespace DiaryRuSearcher
             UmailViewModel comment;
             using (var db = new SQLite.SQLiteConnection(DBPath))
             {
-                var _comment = (db.Table<UmailUnit>().Where(
+                var _comment = (db.Table<UmailStoreModel>().Where(
                     p => p.Umailid.Equals(commentId))).Single();
                 comment = new UmailViewModel(_comment);
             }
@@ -171,7 +201,7 @@ namespace DiaryRuSearcher
             var comments = new ObservableCollection<UmailViewModel>();
             using (var db = new SQLite.SQLiteConnection(DBPath))
             {
-                var query = db.Table<UmailUnit>().OrderByDescending(c => c.Umailid);
+                var query = db.Table<UmailStoreModel>().OrderByDescending(c => c.Umailid);
                 foreach (var _comment in query)
                 {
                     var unit = new UmailViewModel(_comment);
@@ -183,6 +213,7 @@ namespace DiaryRuSearcher
         #endregion
 
         #region UmailFolder
+        /*
         public int InsertUmailFolder(DiaryAPI.JSONResponseClasses.UmailFolderUnit umail)
         {
             int result = 0;
@@ -216,6 +247,7 @@ namespace DiaryRuSearcher
             }
             return folders;
         }
+         * */
         #endregion
 
         #region Search by...
@@ -226,7 +258,7 @@ namespace DiaryRuSearcher
             {
                 if (!string.IsNullOrEmpty(commentAuthor))
                 {
-                    var query = db.Table<CommentUnit>().Where(c => c.Author_username.Equals(commentAuthor)).OrderByDescending(c => c.Dateline);
+                    var query = db.Table<CommentStoreModel>().Where(c => c.Author_username.Equals(commentAuthor)).OrderByDescending(c => c.Dateline);
                     foreach (var _c in query)
                     {
                         var unit = new CommentViewModel(_c);
@@ -236,7 +268,7 @@ namespace DiaryRuSearcher
                 if (!string.IsNullOrEmpty(commentKeyWord))
                 {
                     Regex regex = new Regex(commentKeyWord);
-                    var query = db.Table<CommentUnit>().AsEnumerable().Where(c => regex.IsMatch(c.Message_html)).OrderByDescending(c => c.Dateline);
+                    var query = db.Table<CommentStoreModel>().AsEnumerable().Where(c => regex.IsMatch(c.Message_html)).OrderByDescending(c => c.Dateline);
                     foreach (var _c in query)
                     {
                         var unit = new CommentViewModel(_c);
@@ -254,7 +286,7 @@ namespace DiaryRuSearcher
             {
                 if (!string.IsNullOrEmpty(umailSender))
                 {
-                    var query = db.Table<UmailUnit>().Where(c => c.From_username.Equals(umailSender)).OrderByDescending(c => c.Dateline);
+                    var query = db.Table<UmailStoreModel>().Where(c => c.From_username.Equals(umailSender)).OrderByDescending(c => c.Dateline);
                     foreach (var _c in query)
                     {
                         var unit = new UmailViewModel(_c);
@@ -263,7 +295,7 @@ namespace DiaryRuSearcher
                 }
                 if (!string.IsNullOrEmpty(title))
                 {
-                    var query = db.Table<UmailUnit>().Where(c => c.Title.Contains(title)).OrderBy(c => c.Dateline).OrderByDescending(C => C.Dateline);
+                    var query = db.Table<UmailStoreModel>().Where(c => c.Title.Contains(title)).OrderBy(c => c.Dateline).OrderByDescending(C => C.Dateline);
                     foreach (var _c in query)
                     {
                         var unit = new UmailViewModel(_c);
@@ -273,7 +305,7 @@ namespace DiaryRuSearcher
                 if (!string.IsNullOrEmpty(umailKeyword))
                 {
                     Regex regexp = new Regex(umailKeyword);
-                    var query = db.Table<UmailUnit>().AsEnumerable().Where(c => regexp.IsMatch(c.Message_html)).OrderByDescending(C => C.Dateline);
+                    var query = db.Table<UmailStoreModel>().AsEnumerable().Where(c => regexp.IsMatch(c.Message_html)).OrderByDescending(C => C.Dateline);
                     foreach (var _c in query)
                     {
                         var unit = new UmailViewModel(_c);
@@ -292,7 +324,7 @@ namespace DiaryRuSearcher
             {
                 if (!string.IsNullOrEmpty(postAuthor))
                 {
-                    var query = db.Table<PostUnit>().Where(c => c.Author_username.Equals(postAuthor)).OrderByDescending(c => c.Dateline_date);
+                    var query = db.Table<PostStoreModel>().Where(c => c.Author_username.Equals(postAuthor)).OrderByDescending(c => c.Dateline_date);
                     foreach (var _c in query)
                     {
                         var unit = new PostViewModel(_c);
@@ -301,7 +333,7 @@ namespace DiaryRuSearcher
                 }
                 if (!string.IsNullOrEmpty(postTitle))
                 {
-                    var query = db.Table<PostUnit>().Where(c => c.Title.Contains(postTitle)).OrderByDescending(c => c.Dateline_date);
+                    var query = db.Table<PostStoreModel>().Where(c => c.Title.Contains(postTitle)).OrderByDescending(c => c.Dateline_date);
                     foreach (var _c in query)
                     {
                         var unit = new PostViewModel(_c);
@@ -311,7 +343,7 @@ namespace DiaryRuSearcher
                 if (!string.IsNullOrEmpty(postKeyword))
                 {
                     Regex regexp = new Regex(postKeyword);
-                    var query = db.Table<PostUnit>().AsEnumerable().Where(c => regexp.IsMatch(c.Message_html)).OrderByDescending(c => c.Dateline_date);
+                    var query = db.Table<PostStoreModel>().AsEnumerable().Where(c => regexp.IsMatch(c.Message_html)).OrderByDescending(c => c.Dateline_date);
                     foreach (var _c in query)
                     {
                         var unit = new PostViewModel(_c);

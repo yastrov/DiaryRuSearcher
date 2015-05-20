@@ -146,6 +146,10 @@
     <Compile Include="NewVersionChecker.cs" />
     <Compile Include="SQLite.cs" />
     <Compile Include="SQLiteAsync.cs" />
+    <Compile Include="StoreModel\CommentStoreModel.cs" />
+    <Compile Include="StoreModel\PostStoreModel.cs" />
+    <Compile Include="StoreModel\UmailStoreModel.cs" />
+    <Compile Include="ViewsModels\BaseViewModel.cs" />
     <Compile Include="ViewsModels\CommentViewModel.cs" />
     <Compile Include="ViewsModels\PostViewModel.cs" />
     <Compile Include="ViewsModels\UmailFolderViewModel.cs" />

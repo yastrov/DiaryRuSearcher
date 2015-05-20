@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DiaryAPI.Interfaces;
 using DiaryAPI.JSONResponseClasses;
 using System.Threading;
+using DiaryRuSearcher.StoreModel;
 
 namespace DiaryRuSearcher
 {
@@ -36,7 +37,7 @@ namespace DiaryRuSearcher
         }
         public void ProcessComment(CommentUnit comment)
         {
-            InsertComment(comment);
+            InsertComment(new CommentStoreModel(comment));
         }
         public void ProcessPost(PostUnit post)
         {
@@ -46,7 +47,7 @@ namespace DiaryRuSearcher
                     .CompareTo(_trashholdDate) < 0)
                     _CancellationTokenSource.Cancel();
             }
-            InsertPost(post);
+            InsertPost(new PostStoreModel(post));
         }
         public void ProcessUmail(UmailUnit umail)
         {
@@ -56,7 +57,7 @@ namespace DiaryRuSearcher
                     .CompareTo(_trashholdDate) < 0)
                     _CancellationTokenSource.Cancel();
             }
-            InsertUmail(umail);
+            InsertUmail(new UmailStoreModel(umail));
         }
 
         private static DateTime ConvertFromUnixTimestamp(string timestamp)

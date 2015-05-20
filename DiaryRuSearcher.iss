@@ -2,11 +2,21 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DiaryRuSearcher"
-#define MyAppVersion GetFileVersion("C:\Users\%UserName%\Documents\Atlassian\DiaryRuSearcher\DisryRuSearcher\bin\x86\Release\DiaryRuSearcher.exe")
+
+; Take project folder from systen environment variable
+#define MyProjectName MyAppName
+#define MyGitProjects "MyGitProjects"
+#if GetEnv(MyGitProjects) == ""
+#define MyDistFolder "C:\Users\"+GetEnv("UserName")+"\Documents\Atlassian\"+MyProjectName
+#else
+#define MyDistFolder AddBackslash(GetEnv(MyGitProjects)) + MyProjectName
+#endif
+
+#define MyAppVersion GetFileVersion(MyDistFolder+"\DisryRuSearcher\bin\x86\Release\DiaryRuSearcher.exe")
 #define MyAppPublisher "Yuriy Astrov"
-#define MyAppURL "https://github.com/yastrov/DiaryRuSearcher"
-#define MyAppExeName "DiaryRuSearcher.exe"
-#define MyDistFolder "C:\Users\%UserName%\Documents\Atlassian\DiaryRuSearcher" 
+#define MyAppURL "https://github.com/yastrov/" + MyProjectName
+#define MyAppUpdatedUrl MyAppURL+"/releases"
+#define MyAppExeName "DiaryRuSearcher.exe" 
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -96,16 +106,21 @@ en.InstAttemptM=The installer will attempt to install it
 ru.InstAttemptM=Программа установки попытается установить
 en.FrameworkInstalled=Microsoft Framework 4.5 is beïng installed. Please wait...
 ru.FrameworkInstalled=Microsoft Framework 4.5 Устанавливается. Пожалуйста, подождите...
+en.DeleteSettingsM=Remove settings and local database?
+ru.DeleteSettingsM=Удалить настройки и файл базы данных?
 
 [UninstallDelete]
-Type: files; Name: "{%username}\DiarySearchDB.sqlt"
-Type: filesandordirs; Name: "{%localappdata}\{#MyAppName}"
+Type: files; Name: "{%username}\DiarySearchDB.db"; Check: DoesDeleteSettings
+Type: filesandordirs; Name: "{%localappdata}\{#MyAppName}"; Check: DoesDeleteSettings
+Type: filesandordirs; Name: "{app}";
 
 [LangOptions]
 DialogFontSize=12
 WelcomeFontSize=16
 
 [Code]
+var
+  deleteCHBox : Boolean;
 // http://www.codeproject.com/Tips/506096/InnoSetup-with-NET-installer-x-x-sample
 function IsDotNetDetected(version: string; service: cardinal): boolean;
 // Indicates whether the specified version and service pack of the .NET Framework is installed.
@@ -173,4 +188,27 @@ begin
           '{cm:InstAttemptM}', mbInformation, MB_OK);        
     end;
     result := true;
+end;
+
+function DoesDeleteSettings(): Boolean;
+begin
+  Result:= deleteCHBox;
+end;
+
+procedure TakeAnswerToDelete;
+var
+  answer : Integer;
+  myS : String;
+begin
+  deleteCHBox:=false;
+  myS := ExpandConstant('{cm:DeleteSettingsM}');
+  answer := MsgBox(myS, mbInformation, MB_YESNO);
+  if answer = IDYES then
+    deleteCHBox:=true;
+end;
+
+function InitializeUninstall(): Boolean;
+begin
+    TakeAnswerToDelete;
+    Result:=true;
 end;

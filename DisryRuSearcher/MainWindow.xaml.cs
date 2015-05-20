@@ -19,6 +19,7 @@ using DiaryRuSearcher.ViewsModels;
 using DiaryAPI.JSONResponseClasses;
 using System.Diagnostics;
 using System.ComponentModel;
+using DiaryRuSearcher.Helpers;
 
 namespace DiaryRuSearcher
 {
@@ -168,7 +169,7 @@ namespace DiaryRuSearcher
             get { return _userName; }
             set
             {
-                _userName = value;
+                _userName = value.Trim();
                 NotifyPropertyChanged("UserName");
             }
         }
@@ -178,7 +179,7 @@ namespace DiaryRuSearcher
             get { return _diaryUrlForDownload; }
             set
             {
-                _diaryUrlForDownload = value;
+                _diaryUrlForDownload = value.Trim();
                 NotifyPropertyChanged("DiaryUrlForDownload");
             }
         }
@@ -217,9 +218,7 @@ namespace DiaryRuSearcher
                     string journalShortname = DiaryUrlForDownload.Trim();
                     if (!String.IsNullOrEmpty(journalShortname))
                     {
-                        journalShortname = journalShortname.Replace("http://", String.Empty);
-                        journalShortname = journalShortname.Replace(".diary.ru", String.Empty);
-                        journalShortname = journalShortname.Replace("/", String.Empty);
+                        journalShortname = GetUsernameHelper.GetUsername(journalShortname);
                         await downloadPostsAndComments(journalShortname, IsDownloadComments);
                     }
                     else

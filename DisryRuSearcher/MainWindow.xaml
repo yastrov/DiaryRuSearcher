@@ -254,7 +254,8 @@
                                     <MenuItem Header="Вырезать" Click="CutCommand"/>
                                     <MenuItem Header="Копировать" Click="CopyCommand"/>
                                     <MenuItem Header="Вставить" Click="PastCommand"/>
-                                    <MenuItem Header="Открыть диалог выбора файла" Click="GetFromFileDialogCommand"/>
+                                    <MenuItem Header="Открыть диалог выбора существующего файла" Click="GetFromFileOpenDialogCommand"/>
+                                    <MenuItem Header="Открыть диалог выбора нового файла" Click="GetFromFileSaveDialogCommand"/>
                                 </ContextMenu>
                             </TextBox.ContextMenu>
                         </TextBox>

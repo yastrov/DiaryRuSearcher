@@ -469,18 +469,13 @@ namespace DiaryRuSearcher
             get { return dataBaseFilePath; }
             set
             {
-                DiaryDataBase.DataBasePath = value;
+                DiaryDataBase.DataBasePath = value.Trim();
                 // Неявная проверка
                 dataBaseFilePath = DiaryDataBase.DataBasePath;
                 NotifyPropertyChanged("DataBaseFilePath");
             }
         }
         #endregion
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            GetFromFileDialogCommand();
-        }
 
         private void CutCommand(object sender, RoutedEventArgs e)
         {
@@ -497,16 +492,40 @@ namespace DiaryRuSearcher
             Clipboard.SetText(DataBaseFilePath);
         }
 
-        private void GetFromFileDialogCommand(object sender, RoutedEventArgs e)
+        private void GetFromFileSaveDialogCommand(object sender, RoutedEventArgs e)
         {
-            GetFromFileDialogCommand();
+            GetFromFileSaveDialogCommand();
         }
-
-        private void GetFromFileDialogCommand()
+        private void GetFromFileOpenDialogCommand(object sender, RoutedEventArgs e)
+        {
+            GetFromFileOpenDialogCommand();
+        }
+        private void GetFromFileSaveDialogCommand()
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.DefaultExt = ".sqlt";
-            dlg.Filter = "Diary DataBase (*.sqlt)|*.txt|All Files|*.*";
+            dlg.Filter = "Diary DataBase (*.db,*.sqlite3,*.db3,*.sqlite)|*.db;*.sqlite3;*.db3;*.sqlite|All Files|*.*";
+            dlg.Title = "Выберите файл для хранения базы данных:";
+            if (!string.IsNullOrEmpty(DataBaseFilePath))
+            {
+                dlg.InitialDirectory = System.IO.Path.GetDirectoryName(DataBaseFilePath);
+            }
+            else
+            {
+                dlg.InitialDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
+            }
+
+            Nullable<bool> result = dlg.ShowDialog();
+            if (result == true)
+            {
+                DataBaseFilePath = dlg.FileName;
+            }
+        }
+        private void GetFromFileOpenDialogCommand()
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".sqlt";
+            dlg.Filter = "Diary DataBase (*.db,*.sqlite3,*.db3,*.sqlite)|*.db;*.sqlite3;*.db3;*.sqlite|All Files|*.*";
             dlg.Title = "Выберите файл для хранения базы данных:";
             if (!string.IsNullOrEmpty(DataBaseFilePath))
             {

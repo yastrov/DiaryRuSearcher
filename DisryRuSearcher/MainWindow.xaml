@@ -14,7 +14,7 @@
         <DataTemplate x:Key="UrlFieldTemplate">
             <TextBlock>
                 <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding Url}"
-                           CommandParameter="{Binding}"><TextBlock Text="{Binding Url}"/></Hyperlink>
+                           CommandParameter="{Binding}"><TextBlock Text="{Binding Url}" ToolTip="{Binding Url}"/></Hyperlink>
             </TextBlock>
         </DataTemplate>
         <DataTemplate x:Key="MessageFieldTemplate">
@@ -110,6 +110,14 @@
                                         </GridViewColumnHeader.ContextMenu>
                                     </GridViewColumnHeader>
                                 </GridViewColumn>
+                                <GridViewColumn Header="Автор поста"
+                                                Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                        <TextBlock Text="{Binding Author_username}" ToolTip="{Binding Author_username}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
                                 <GridViewColumn DisplayMemberBinding="{Binding Title}"
                                                 Header="Заголовок"
                                                 Width="100"/>
@@ -160,8 +168,13 @@
                                     </GridViewColumnHeader>
                                 </GridViewColumn>
                                 <GridViewColumn Header="Автор"
-                                                Width="100"
-                                                DisplayMemberBinding="{Binding Author_username}"/>
+                                                Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Author_username}" ToolTip="{Binding Author_username}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
                                 <GridViewColumn Header="Сообщение"
                                                 Width="Auto"
                                                 CellTemplate="{StaticResource MessageFieldTemplate}"/>

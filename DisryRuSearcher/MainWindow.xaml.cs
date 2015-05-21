@@ -273,21 +273,24 @@ namespace DiaryRuSearcher
         {
             string commentAuthor = commentAuthorTextBox.Text.Trim();
             string commentKeyWord = commentsKeywordTextBox.Text.Trim();
-            CommentsCollection = _diaryDataBase.GetCommentsByAuthorKeyword(commentAuthor, commentKeyWord);
+            var result = _diaryDataBase.GetCommentsByAuthorKeyword(commentAuthor, commentKeyWord);
+            CommentsCollection = new ObservableCollection<CommentViewModel>(result);
         }
         private void umailSearchButton_Click(object sender, RoutedEventArgs e)
         {
             string umailSender = umailSenderNameTextBox.Text.Trim();
             string umailKeyword = umailKeywordTextBox.Text.Trim();
             string umailTitle = umailTitleTextBox.Text.Trim();
-            UmailsCollection = _diaryDataBase.GetUmailsBySenderTitleKeyword(umailSender, umailTitle, umailKeyword);
+            var result = _diaryDataBase.GetUmailsBySenderTitleKeyword(umailSender, umailTitle, umailKeyword);
+            UmailsCollection = new ObservableCollection<UmailViewModel>(result);
         }
         private void postSearchButton_Click(object sender, RoutedEventArgs e)
         {
             string postTitle = postSearchTitleTextBox.Text.Trim();
             string postKeyword = postSearchKeywordTextBox.Text.Trim();
             string postAuthor = postSearchAuthorTextBox.Text.Trim();
-            PostsCollection = _diaryDataBase.GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
+            var result = _diaryDataBase.GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
+            PostsCollection = new ObservableCollection<PostViewModel>(result);
         }
         #endregion
 
@@ -509,6 +512,7 @@ namespace DiaryRuSearcher
             if (!string.IsNullOrEmpty(DataBaseFilePath))
             {
                 dlg.InitialDirectory = System.IO.Path.GetDirectoryName(DataBaseFilePath);
+                dlg.DefaultExt = System.IO.Path.GetExtension(DataBaseFilePath);
             }
             else
             {
@@ -530,6 +534,7 @@ namespace DiaryRuSearcher
             if (!string.IsNullOrEmpty(DataBaseFilePath))
             {
                 dlg.InitialDirectory = System.IO.Path.GetDirectoryName(DataBaseFilePath);
+                dlg.DefaultExt = System.IO.Path.GetExtension(DataBaseFilePath);
             }
             else
             {

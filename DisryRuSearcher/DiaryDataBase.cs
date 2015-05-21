@@ -251,107 +251,133 @@ namespace DiaryRuSearcher
         #endregion
 
         #region Search by...
-        public ObservableCollection<CommentViewModel> GetCommentsByAuthorKeyword(string commentAuthor, string commentKeyWord)
+        public IEnumerable<CommentViewModel> GetCommentsByAuthorKeyword(string commentAuthor, string commentKeyWord)
         {
-            var result = new ObservableCollection<CommentViewModel>();
+            Regex regex;
+            IEnumerable<CommentViewModel> result = new List<CommentViewModel>();
             using (var db = new SQLite.SQLiteConnection(DBPath))
             {
-                if (!string.IsNullOrEmpty(commentAuthor))
+                if (!string.IsNullOrEmpty(commentAuthor) && string.IsNullOrEmpty(commentKeyWord))
                 {
-                    var query = db.Table<CommentStoreModel>().Where(c => c.Author_username.Equals(commentAuthor)).OrderByDescending(c => c.Dateline);
-                    foreach (var _c in query)
-                    {
-                        var unit = new CommentViewModel(_c);
-                        result.Add(unit);
-                    }
+                    regex = new Regex(commentAuthor);
+                    result = db.Table<CommentStoreModel>().AsEnumerable()
+                        .Where(c => regex.IsMatch(c.Author_username))
+                        .OrderByDescending(c => c.Dateline).Select(item => new CommentViewModel(item)).ToList();
                 }
-                if (!string.IsNullOrEmpty(commentKeyWord))
+                if (!string.IsNullOrEmpty(commentKeyWord) && string.IsNullOrEmpty(commentAuthor))
                 {
-                    Regex regex = new Regex(commentKeyWord);
-                    var query = db.Table<CommentStoreModel>().AsEnumerable().Where(c => regex.IsMatch(c.Message_html)).OrderByDescending(c => c.Dateline);
-                    foreach (var _c in query)
-                    {
-                        var unit = new CommentViewModel(_c);
-                        result.Add(unit);
-                    }
+                    regex = new Regex(commentKeyWord);
+                    result = db.Table<CommentStoreModel>().AsEnumerable()
+                        .Where(c => regex.IsMatch(c.Message_html))
+                        .OrderByDescending(c => c.Dateline).Select(item => new CommentViewModel(item)).ToList();
                 }
+                if (!string.IsNullOrEmpty(commentKeyWord) && !string.IsNullOrEmpty(commentAuthor))
+                {
+                    regex = new Regex(commentAuthor);
+                    var r1 = new Regex(commentKeyWord);
+                    result = db.Table<CommentStoreModel>().AsEnumerable()
+                        .Where(c => regex.IsMatch(c.Author_username))
+                        .Where(c => r1.IsMatch(c.Message_html))
+                        .OrderByDescending(c => c.Dateline).Select(item => new CommentViewModel(item)).ToList();
+                }
+                return result;
             }
-            return result;
         }
 
-        public ObservableCollection<UmailViewModel> GetUmailsBySenderTitleKeyword(string umailSender, string title, string umailKeyword)
+        public IEnumerable<UmailViewModel> GetUmailsBySenderTitleKeyword(string umailSender, string title, string umailKeyword)
         {
-            var result = new ObservableCollection<UmailViewModel>();
+            Stack<IEnumerable<UmailStoreModel>> r = new Stack<IEnumerable<UmailStoreModel>>(3);
+            IEnumerable<UmailStoreModel> q;
+            Regex regexp;
             using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 if (!string.IsNullOrEmpty(umailSender))
                 {
-                    var query = db.Table<UmailStoreModel>().Where(c => c.From_username.Equals(umailSender)).OrderByDescending(c => c.Dateline);
-                    foreach (var _c in query)
-                    {
-                        var unit = new UmailViewModel(_c);
-                        result.Add(unit);
-                    }
+                    regexp = new Regex(umailSender);
+                    q = db.Table<UmailStoreModel>().AsEnumerable()
+                        .Where(c => regexp.IsMatch(c.From_username)).ToList();
+                        //.OrderByDescending(c => c.Dateline);
+                    r.Push(q);
+                    
                 }
                 if (!string.IsNullOrEmpty(title))
                 {
-                    var query = db.Table<UmailStoreModel>().Where(c => c.Title.Contains(title)).OrderBy(c => c.Dateline).OrderByDescending(C => C.Dateline);
-                    foreach (var _c in query)
-                    {
-                        var unit = new UmailViewModel(_c);
-                        result.Add(unit);
-                    }
+                    regexp = new Regex(title);
+                    q = db.Table<UmailStoreModel>().AsEnumerable()
+                        .Where(c => regexp.IsMatch(c.Title))
+                        .ToList();//.OrderByDescending(C => C.Dateline);
+                    r.Push(q);
+                    
                 }
                 if (!string.IsNullOrEmpty(umailKeyword))
                 {
-                    Regex regexp = new Regex(umailKeyword);
-                    var query = db.Table<UmailStoreModel>().AsEnumerable().Where(c => regexp.IsMatch(c.Message_html)).OrderByDescending(C => C.Dateline);
-                    foreach (var _c in query)
-                    {
-                        var unit = new UmailViewModel(_c);
-                        result.Add(unit);
-                    }
+                    regexp = new Regex(umailKeyword);
+                    q = db.Table<UmailStoreModel>().AsEnumerable()
+                        .Where(c => regexp.IsMatch(c.Message_html)).ToList();
+                    r.Push(q);
+                        //.OrderByDescending(C => C.Dateline);
+                    
                 }
             }
-            return result;
+            #region Intersect
+            if (r.Count == 0)
+                return new List<UmailViewModel>();
+            else
+            {
+                while (r.Count > 1)
+                {
+                    var i = r.Pop();
+                    i = Enumerable.Intersect(i, r.Pop(), i.First());
+                    r.Push(i);
+                }
+                return r.Pop().OrderByDescending(item => item.Dateline)
+                    .Select(item => new UmailViewModel(item));
+            }
+            #endregion
         }
         #endregion
 
-        public ObservableCollection<PostViewModel> GetPostsByAuthorTitleKeyword(string postAuthor, string postTitle, string postKeyword)
+        public IEnumerable<PostViewModel> GetPostsByAuthorTitleKeyword(string postAuthor, string postTitle, string postKeyword)
         {
-            var result = new ObservableCollection<PostViewModel>();
+            Stack<IEnumerable<PostStoreModel>> r = new Stack<IEnumerable<PostStoreModel>>(3);
+            Regex regexp;
             using (var db = new SQLite.SQLiteConnection(DBPath))
             {
                 if (!string.IsNullOrEmpty(postAuthor))
                 {
-                    var query = db.Table<PostStoreModel>().Where(c => c.Author_username.Equals(postAuthor)).OrderByDescending(c => c.Dateline_date);
-                    foreach (var _c in query)
-                    {
-                        var unit = new PostViewModel(_c);
-                        result.Add(unit);
-                    }
+                    regexp = new Regex(postAuthor);
+                    var q = db.Table<PostStoreModel>().AsEnumerable()
+                        .Where(c => regexp.IsMatch(c.Author_username)).ToList();
+                    r.Push(q);
                 }
                 if (!string.IsNullOrEmpty(postTitle))
                 {
-                    var query = db.Table<PostStoreModel>().Where(c => c.Title.Contains(postTitle)).OrderByDescending(c => c.Dateline_date);
-                    foreach (var _c in query)
-                    {
-                        var unit = new PostViewModel(_c);
-                        result.Add(unit);
-                    }
+                    regexp = new Regex(postTitle);
+                    var q = db.Table<PostStoreModel>().AsEnumerable()
+                        .Where(c => regexp.IsMatch(c.Title)).ToList();
+                    r.Push(q);
                 }
                 if (!string.IsNullOrEmpty(postKeyword))
                 {
-                    Regex regexp = new Regex(postKeyword);
-                    var query = db.Table<PostStoreModel>().AsEnumerable().Where(c => regexp.IsMatch(c.Message_html)).OrderByDescending(c => c.Dateline_date);
-                    foreach (var _c in query)
-                    {
-                        var unit = new PostViewModel(_c);
-                        result.Add(unit);
-                    }
+                    regexp = new Regex(postKeyword);
+                    var q= db.Table<PostStoreModel>().AsEnumerable()
+                        .Where(c => regexp.IsMatch(c.Message_html)).ToList();
+                    r.Push(q);
                 }
             }
-            return result;
+            if (r.Count == 0)
+                return new List<PostViewModel>();
+            else
+            {
+                while (r.Count > 1)
+                {
+                    var i = r.Pop();
+                    i = Enumerable.Intersect(i, r.Pop(), i.First());
+                    r.Push(i);
+                }
+                return r.Pop().OrderByDescending(item => item.Dateline_date)
+                    .Select(item => new PostViewModel(item));
+            }
         }
     }
 }

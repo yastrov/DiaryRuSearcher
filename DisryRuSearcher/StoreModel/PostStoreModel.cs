@@ -7,7 +7,7 @@ using SQLite;
 
 namespace DiaryRuSearcher.StoreModel
 {
-    public class PostStoreModel
+    public class PostStoreModel:IEqualityComparer<PostStoreModel>
     {
         public string Avatar_path { get; set; }
         public string Author_title { get; set; }
@@ -67,6 +67,16 @@ namespace DiaryRuSearcher.StoreModel
             //this.Tags_data = post.Tags_data;
             this.Title = post.Title;
             this.Message_html = post.Message_html;
+        }
+
+        public bool Equals(PostStoreModel x, PostStoreModel y)
+        {
+            return x.Postid.Equals(y.Postid);
+        }
+
+        public int GetHashCode(PostStoreModel obj)
+        {
+            return obj.Postid.GetHashCode();
         }
     }
 }

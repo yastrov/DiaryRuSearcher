@@ -7,7 +7,7 @@ using SQLite;
 
 namespace DiaryRuSearcher.StoreModel
 {
-    public class UmailStoreModel
+    public class UmailStoreModel: IEqualityComparer<UmailStoreModel>
     {
         public string From_username { get; set; }
         public string Message_html { get; set; }
@@ -32,6 +32,16 @@ namespace DiaryRuSearcher.StoreModel
             this.Umailid = umail.Umailid;
             this.From_userid = umail.From_userid;
             this.No_smilies = umail.No_smilies;
+        }
+
+        public bool Equals(UmailStoreModel x, UmailStoreModel y)
+        {
+            return x.Umailid.Equals(y.Umailid);
+        }
+
+        public int GetHashCode(UmailStoreModel obj)
+        {
+            throw new NotImplementedException();
         }
     }
 }

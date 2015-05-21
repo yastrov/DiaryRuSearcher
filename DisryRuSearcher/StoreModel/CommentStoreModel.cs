@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DiaryRuSearcher.StoreModel
 {
-    public class CommentStoreModel
+    public class CommentStoreModel:IEqualityComparer<CommentStoreModel>
     {
         public string Can_edit { get; set; }
         public string Author_title { get; set; }
@@ -45,6 +45,16 @@ namespace DiaryRuSearcher.StoreModel
             this.Message_html = comment.Message_html;
             this.Message_src = comment.Message_src;
             this.Postid = comment.Postid;
+        }
+
+        public bool Equals(CommentStoreModel x, CommentStoreModel y)
+        {
+            return x.Commentid.Equals(y.Commentid);
+        }
+
+        public int GetHashCode(CommentStoreModel obj)
+        {
+            return obj.Commentid.GetHashCode();
         }
     }
 }

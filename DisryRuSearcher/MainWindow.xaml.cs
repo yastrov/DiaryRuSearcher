@@ -273,7 +273,20 @@ namespace DiaryRuSearcher
         {
             string commentAuthor = commentAuthorTextBox.Text.Trim();
             string commentKeyWord = commentsKeywordTextBox.Text.Trim();
-            var result = _diaryDataBase.GetCommentsByAuthorKeyword(commentAuthor, commentKeyWord);
+            IsImportantControlEnabled = false;
+            IEnumerable<CommentViewModel> result = new List<CommentViewModel>();
+            try
+            {
+                result = _diaryDataBase.GetCommentsByAuthorKeyword(commentAuthor, commentKeyWord);
+            }
+            catch (SQLite.SQLiteException ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsImportantControlEnabled = true;
+            }
             CommentsCollection = new ObservableCollection<CommentViewModel>(result);
         }
         private void umailSearchButton_Click(object sender, RoutedEventArgs e)
@@ -281,7 +294,19 @@ namespace DiaryRuSearcher
             string umailSender = umailSenderNameTextBox.Text.Trim();
             string umailKeyword = umailKeywordTextBox.Text.Trim();
             string umailTitle = umailTitleTextBox.Text.Trim();
-            var result = _diaryDataBase.GetUmailsBySenderTitleKeyword(umailSender, umailTitle, umailKeyword);
+            IsImportantControlEnabled = false;
+            IEnumerable<UmailViewModel> result = new List<UmailViewModel>();
+            try {
+                result = _diaryDataBase.GetUmailsBySenderTitleKeyword(umailSender, umailTitle, umailKeyword);
+            }
+            catch(SQLite.SQLiteException ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsImportantControlEnabled = true;
+            }
             UmailsCollection = new ObservableCollection<UmailViewModel>(result);
         }
         private void postSearchButton_Click(object sender, RoutedEventArgs e)
@@ -289,7 +314,20 @@ namespace DiaryRuSearcher
             string postTitle = postSearchTitleTextBox.Text.Trim();
             string postKeyword = postSearchKeywordTextBox.Text.Trim();
             string postAuthor = postSearchAuthorTextBox.Text.Trim();
-            var result = _diaryDataBase.GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
+            IsImportantControlEnabled = false;
+            IEnumerable<PostViewModel> result = new List<PostViewModel>();
+            try
+            {
+                result = _diaryDataBase.GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
+            }
+            catch(SQLite.SQLiteException ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, this.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsImportantControlEnabled = true;
+            }
             PostsCollection = new ObservableCollection<PostViewModel>(result);
         }
         #endregion

@@ -127,7 +127,9 @@
                             </GridView>
                         </ListView.View>
                     </ListView>
-                    <Button Name="postSearchButton" Content="Искать" Click="postSearchButton_Click" Grid.Column="2" Grid.RowSpan="3"/>
+                    <Button Name="postSearchButton" Content="Искать" Click="postSearchButton_Click"
+                            IsEnabled="{Binding IsImportantControlEnabled}"
+                            Grid.Column="2" Grid.RowSpan="3"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Поиск по Комментариям" Name="commenttFindTabItem"  Height="Auto">
@@ -142,7 +144,9 @@
                         <ColumnDefinition/>
                         <ColumnDefinition MaxWidth="80"/>
                     </Grid.ColumnDefinitions>
-                    <Button Name="commentsSearchButton" Content="Искать" Click="commentsSearchButton_Click" Grid.Column="2" Grid.RowSpan="2"/>
+                    <Button Name="commentsSearchButton" Content="Искать" Click="commentsSearchButton_Click"
+                            IsEnabled="{Binding IsImportantControlEnabled}"
+                            Grid.Column="2" Grid.RowSpan="2"/>
                     <Label Content="Автор:" Grid.Column="0" Grid.Row="0"/>
                     <TextBox Name="commentAuthorTextBox" Grid.Column="1" Grid.Row="0"/>
                     <Label Content="Ключевое слово:" Grid.Column="0" Grid.Row="1"/>
@@ -196,7 +200,9 @@
                         <ColumnDefinition />
                         <ColumnDefinition MaxWidth="80"/>
                     </Grid.ColumnDefinitions>
-                    <Button Name="umailSearchButton" Content="Искать" Click="umailSearchButton_Click" Grid.Column="2" Grid.RowSpan="2"/>
+                    <Button Name="umailSearchButton" Content="Искать" Click="umailSearchButton_Click"
+                            IsEnabled="{Binding IsImportantControlEnabled}"
+                            Grid.Column="2" Grid.RowSpan="2"/>
                     <Label Content="Отправитель:" Grid.Column="0" Grid.Row="0"/>
                     <TextBox Name="umailSenderNameTextBox" Grid.Column="1" Grid.Row="0"/>
                     <Label Content="Тема:"  Grid.Column="0" Grid.Row="1"/>

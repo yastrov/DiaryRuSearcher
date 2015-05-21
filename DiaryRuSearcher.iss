@@ -11,12 +11,13 @@
 #else
 #define MyDistFolder AddBackslash(GetEnv(MyGitProjects)) + MyProjectName
 #endif
+#define MyReleaseFolder MyDistFolder + "\DisryRuSearcher\bin\x86\Release"
 
-#define MyAppVersion GetFileVersion(MyDistFolder+"\DisryRuSearcher\bin\x86\Release\DiaryRuSearcher.exe")
 #define MyAppPublisher "Yuriy Astrov"
 #define MyAppURL "https://github.com/yastrov/" + MyProjectName
 #define MyAppUpdatedUrl MyAppURL+"/releases"
 #define MyAppExeName "DiaryRuSearcher.exe" 
+#define MyAppVersion GetFileVersion(AddBackslash(MyReleaseFolder)+MyAppExeName)
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -73,15 +74,16 @@ Name: "writeinstalledpath"; Description: "{cm:WriteInstalledPath}"; Flags: unche
 Root: HKLM; Subkey: Software\YAstrov\{#MyAppName}; ValueType: string; ValueName: InstallPath; ValueData: {app}; Tasks: writeinstalledpath
 
 [Files]
-Source: "{#MyDistFolder}\DisryRuSearcher\bin\x86\Release\DiaryRuSearcher.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#MyDistFolder}\DisryRuSearcher\bin\x86\Release\DiaryAPIClient.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#MyDistFolder}\DisryRuSearcher\bin\x86\Release\EntityFramework.dll"; DestDir: "{app}";
-Source: "{#MyDistFolder}\DisryRuSearcher\bin\x86\Release\EntityFramework.SqlServer.dll"; DestDir: "{app}";
-Source: "{#MyDistFolder}\DisryRuSearcher\bin\x86\Release\Newtonsoft.Json.dll"; DestDir: "{app}";
-Source: "{#MyDistFolder}\DisryRuSearcher\bin\x86\Release\sqlite3.dll"; DestDir: "{app}";
-Source: "{#MyDistFolder}\DisryRuSearcher\bin\x86\Release\System.Data.SQLite.dll"; DestDir: "{app}";
-Source: "{#MyDistFolder}\DisryRuSearcher\bin\x86\Release\System.Data.SQLite.EF6.dll"; DestDir: "{app}";
-Source: "{#MyDistFolder}\DisryRuSearcher\bin\x86\Release\System.Data.SQLite.Linq.dll"; DestDir: "{app}";
+Source: "{#MyReleaseFolder}\DiaryRuSearcher.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyReleaseFolder}\DiaryAPIClient.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyReleaseFolder}\EntityFramework.dll"; DestDir: "{app}";
+Source: "{#MyReleaseFolder}\EntityFramework.SqlServer.dll"; DestDir: "{app}";
+Source: "{#MyReleaseFolder}\Newtonsoft.Json.dll"; DestDir: "{app}";
+Source: "{#MyReleaseFolder}\sqlite3.dll"; DestDir: "{app}";
+Source: "{#MyReleaseFolder}\System.Data.SQLite.dll"; DestDir: "{app}";
+Source: "{#MyReleaseFolder}\System.Data.SQLite.EF6.dll"; DestDir: "{app}";
+Source: "{#MyReleaseFolder}\System.Data.SQLite.Linq.dll"; DestDir: "{app}";
+Source: "{#MyReleaseFolder}\x86\SQLite.Interop.dll"; DestDir: "{app}\x86";
 Source: "dotNetFx40_Full_setup.exe"; DestDir: {tmp}; Flags: deleteafterinstall; Check: not IsRequiredDotNetDetected
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

@@ -97,6 +97,9 @@ namespace DiaryRuSearcher.ViewsModels
             umail.No_smilies = view.No_smilies;
             return umail;
         }
+
+        public UmailViewModel()
+        { ;}
     }
 
 }

@@ -112,7 +112,7 @@ namespace DiaryRuSearcher.ViewsModels
             this.Message_src = comment.Message_src;
             this.Postid = comment.Postid;
         }
-
+        public CommentViewModel() { ;}
         
     }
 }

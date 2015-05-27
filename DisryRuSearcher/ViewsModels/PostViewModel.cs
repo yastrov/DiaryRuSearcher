@@ -183,5 +183,8 @@ namespace DiaryRuSearcher.ViewsModels
             post.Message_html = view.Message_html;
             return post;
         }
+
+        public PostViewModel()
+        { ;}
     }
 }

@@ -170,6 +170,19 @@ namespace DiaryRuSearcher
             }
             return comments;
         }
+        public IEnumerable<CommentViewModel> GetCommentsByPostId(string PostId)
+        {
+            IEnumerable<CommentViewModel> comments;
+            using (var db = new SQLite.SQLiteConnection(DBPath))
+            {
+                comments = db.Table<CommentStoreModel>()
+                    .Where(item => item.Postid.Equals(PostId))
+                    .OrderByDescending(c => c.Commentid)
+                    .Select(item => new CommentViewModel(item))
+                    .ToList();
+            }
+            return comments;
+        }
         #endregion
         #region Umail
         public int InsertUmail(UmailStoreModel umail)

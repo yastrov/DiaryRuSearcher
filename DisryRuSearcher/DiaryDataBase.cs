@@ -44,6 +44,8 @@ namespace DiaryRuSearcher
                 db.CreateTable<UmailStoreModel>();
                 db.CreateTable<PostStoreModel>();
                 db.CreateTable<CommentStoreModel>();
+                db.CreateTable<TagStoreModel>();
+                db.CreateTable<TagRelationStoreModel>();
             }
         }
 
@@ -250,6 +252,63 @@ namespace DiaryRuSearcher
          * */
         #endregion
 
+        #region Tags
+        public IEnumerable<TagViewModel> GetTags(){
+            IEnumerable<TagViewModel> result;
+            using (var db = new SQLite.SQLiteConnection(DBPath))
+            {
+               result = db.Table<TagStoreModel>()
+                   .OrderBy(c => c.Description)
+                   .Select(item => new TagViewModel(item))
+                   .ToList();
+
+            }
+            return result;
+        }
+        public TagViewModel GetTag(string TagId)
+        {
+            TagViewModel post = null;
+            using (var db = new SQLite.SQLiteConnection(DBPath))
+            {
+                var _post = (db.Table<TagStoreModel>().Where(
+                   p => p.TagId.Equals(TagId))).Single();
+                if (_post != null)
+                    post = new TagViewModel(_post);
+            }
+            return post;
+        }
+
+        public int InsertTagWithoutReplace(TagStoreModel tag)
+        {
+            int result = -1;
+            using (var db = new SQLite.SQLiteConnection(DBPath))
+            {
+                var existingPost = db.Table<TagStoreModel>().Where(
+                       p => p.TagId.Equals(tag.TagId)).SingleOrDefault();
+                if (existingPost == null)
+                {
+                    result = db.Insert(tag);
+                }
+            }
+            return result;
+        }
+
+        public int InsertRelation(TagRelationStoreModel model)
+        {
+            int result = -1;
+            using (var db = new SQLite.SQLiteConnection(DBPath))
+            {
+                var existingPost = db.Table<TagRelationStoreModel>().Where(
+                       p => p.TagId.Equals(model.TagId) && p.PostId.Equals(model.PostId)).SingleOrDefault();
+                if (existingPost == null)
+                {
+                    result = db.Insert(model);
+                }
+            }
+            return result;
+        }
+        #endregion
+
         #region Search by...
         public IEnumerable<CommentViewModel> GetCommentsByAuthorKeyword(string commentAuthor, string commentKeyWord)
         {
@@ -337,7 +396,7 @@ namespace DiaryRuSearcher
         }
         #endregion
 
-        public IEnumerable<PostViewModel> GetPostsByAuthorTitleKeyword(string postAuthor, string postTitle, string postKeyword)
+        public IEnumerable<PostViewModel> GetPostsByAuthorTitleKeyword(string postAuthor, string postTitle, string postKeyword, IEnumerable<TagViewModel> tags)
         {
             Stack<IEnumerable<PostStoreModel>> r = new Stack<IEnumerable<PostStoreModel>>(3);
             Regex regexp;
@@ -362,6 +421,17 @@ namespace DiaryRuSearcher
                     regexp = new Regex(postKeyword);
                     var q= db.Table<PostStoreModel>().AsEnumerable()
                         .Where(c => regexp.IsMatch(c.Message_html)).ToList();
+                    r.Push(q);
+                }
+                if(tags != null && tags.Count() > 0)
+                {
+                    var tagIdList = tags.Select(item => item.TagId);
+                    var postIdList = db.Table<TagRelationStoreModel>()
+                        .Where(item => tagIdList.Contains(item.TagId))
+                        .Select(item=>item.PostId).ToList();
+                    var q = db.Table<PostStoreModel>()
+                        .Where(item => postIdList.Contains(item.Postid))
+                        .ToList();
                     r.Push(q);
                 }
             }

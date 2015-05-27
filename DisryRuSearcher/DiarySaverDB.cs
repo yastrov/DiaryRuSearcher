@@ -48,6 +48,11 @@ namespace DiaryRuSearcher
                     _CancellationTokenSource.Cancel();
             }
             InsertPost(new PostStoreModel(post));
+            foreach(var item in post.Tags_data)
+            {
+                InsertTagWithoutReplace(new TagStoreModel(item.Key, item.Value));
+                InsertRelation(new TagRelationStoreModel(item.Key, post.Postid));
+            }
         }
         public void ProcessUmail(UmailUnit umail)
         {

@@ -149,10 +149,13 @@
     <Compile Include="SQLiteAsync.cs" />
     <Compile Include="StoreModel\CommentStoreModel.cs" />
     <Compile Include="StoreModel\PostStoreModel.cs" />
+    <Compile Include="StoreModel\TagRelationStoreModel.cs" />
+    <Compile Include="StoreModel\TagStoreModel.cs" />
     <Compile Include="StoreModel\UmailStoreModel.cs" />
     <Compile Include="ViewsModels\BaseViewModel.cs" />
     <Compile Include="ViewsModels\CommentViewModel.cs" />
     <Compile Include="ViewsModels\PostViewModel.cs" />
+    <Compile Include="ViewsModels\TagViewModel.cs" />
     <Compile Include="ViewsModels\UmailFolderViewModel.cs" />
     <Compile Include="ViewsModels\UmailViewModel.cs" />
     <Page Include="MainWindow.xaml">

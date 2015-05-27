@@ -38,6 +38,7 @@ namespace DiaryRuSearcher
         private ObservableCollection<CommentViewModel> commentsCollection = null;
         private ObservableCollection<UmailViewModel> umailsCollection = null;
         private ObservableCollection<UmailFolderViewModel> umailFoldersCollection = null;
+        private ObservableCollection<TagViewModel> _tagsCollection = null;
 
         #region Inotify
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
@@ -99,6 +100,16 @@ namespace DiaryRuSearcher
             {
                 _trashDate = value;
                 NotifyPropertyChanged("TrashDate");
+            }
+        }
+
+        private ObservableCollection<TagViewModel> TagsCollection
+        {
+            get { return _tagsCollection; }
+            set
+            {
+                _tagsCollection = value;
+                NotifyPropertyChanged("TagsCollection");
             }
         }
         #endregion
@@ -212,6 +223,7 @@ namespace DiaryRuSearcher
             try
             {
                 await Auth();
+                System.Windows.MessageBox.Show(diaryAPIClient.SID);
                 diaryAPIClient.TimeoutBetweenRequests = TimeoutBetweenRequests;
                 if (IsDownloadPosts)
                 {
@@ -316,9 +328,10 @@ namespace DiaryRuSearcher
             string postAuthor = postSearchAuthorTextBox.Text.Trim();
             IsImportantControlEnabled = false;
             IEnumerable<PostViewModel> result = new List<PostViewModel>();
+            var tags = TagsCollection.Where(item => item.IsSelected);
             try
             {
-                result = _diaryDataBase.GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword);
+                result = _diaryDataBase.GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword, tags);
             }
             catch(SQLite.SQLiteException ex)
             {
@@ -342,7 +355,6 @@ namespace DiaryRuSearcher
         async Task Auth()
         {
             await diaryAPIClient.AuthSecureAsync(UserName.Trim(), passwordBox.SecurePassword);
-
         }
         async private Task downloadPostsAndComments(string shortname, bool withComments)
         {
@@ -585,5 +597,39 @@ namespace DiaryRuSearcher
                 DataBaseFilePath = dlg.FileName;
             }
         }
+
+        #region Posts Search
+        /// <summary>
+        /// View post with comments in other window via double mouse left button click.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PostsListViewDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+           var u = ((sender as ListView).SelectedItem as PostViewModel).Url;
+           MessageBox.Show(u, Title);
+        }
+
+        private void Expander_Expanded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                TagsCollection = new ObservableCollection<TagViewModel>(_diaryDataBase.GetTags());
+            }
+            catch(SQLite.SQLiteException ex)
+            {
+                MessageBox.Show(ex.ToString(), Title, MessageBoxButton.OK, MessageBoxImage.Error);
+                TagsCollection = new ObservableCollection<TagViewModel>();
+            }
+        }
+
+        private void ClearAllTagsForPostChoiceClick(object sender, RoutedEventArgs e)
+        {
+            foreach(var tag in TagsCollection)
+            {
+                tag.IsSelected = false;
+            }
+        }
+        #endregion
     }
 }

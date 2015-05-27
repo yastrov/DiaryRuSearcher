@@ -77,6 +77,7 @@
                         <RowDefinition Height="40"/>
                         <RowDefinition Height="40"/>
                         <RowDefinition Height="40"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -93,7 +94,7 @@
                     <ListView Name="postsListView"
                               ItemsSource="{Binding PostsCollection}"
                               Grid.ColumnSpan="4"
-                              Grid.Row="3">
+                              Grid.Row="4" MouseDoubleClick="PostsListViewDoubleClick">
                         <ListView.View>
                             <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Информация о постах">
                                 <GridViewColumn Header="Url"
@@ -130,6 +131,32 @@
                     <Button Name="postSearchButton" Content="Искать" Click="postSearchButton_Click"
                             IsEnabled="{Binding IsImportantControlEnabled}"
                             Grid.Column="2" Grid.RowSpan="3"/>
+                    <Expander
+                        IsExpanded="False"
+                        ToolTip="Tags"
+                        Header="Tags"
+                        ExpandDirection="Down"
+                        IsEnabled="{Binding IsImportantControlEnabled}"
+                        Grid.ColumnSpan="3" Grid.Row="3" Expanded="Expander_Expanded">
+                            <ListView ItemsSource="{Binding TagsCollection}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Description}"
+                                                   HorizontalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListViewItem}">
+                                        <Setter Property="IsSelected" Value="{Binding Mode=TwoWay, Path=IsSelected}"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Очистить выбор" Click="ClearAllTagsForPostChoiceClick"/>
+                                </ContextMenu>
+                            </ListView.ContextMenu>
+                            </ListView>
+                    </Expander>
                 </Grid>
             </TabItem>
             <TabItem Header="Поиск по Комментариям" Name="commenttFindTabItem"  Height="Auto">

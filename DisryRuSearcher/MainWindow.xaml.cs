@@ -328,7 +328,9 @@ namespace DiaryRuSearcher
             string postAuthor = postSearchAuthorTextBox.Text.Trim();
             IsImportantControlEnabled = false;
             IEnumerable<PostViewModel> result = new List<PostViewModel>();
-            var tags = TagsCollection.Where(item => item.IsSelected);
+            IEnumerable<TagViewModel> tags = null;
+            if (TagsCollection != null)
+                tags = TagsCollection.Where(item => item.IsSelected);
             try
             {
                 result = _diaryDataBase.GetPostsByAuthorTitleKeyword(postAuthor, postTitle, postKeyword, tags);

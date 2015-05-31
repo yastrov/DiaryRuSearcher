@@ -91,6 +91,7 @@
     <Compile Include="DiaryAPIClientRequest.cs" />
     <Compile Include="DiaryAPIClientException.cs" />
     <Compile Include="DiaryAPIClientUser.cs" />
+    <Compile Include="DiaryStopWatcher.cs" />
     <Compile Include="Interfaces\ICommentProcessor.cs" />
     <Compile Include="Interfaces\IErrorChecked.cs" />
     <Compile Include="Interfaces\IPostCommentsProcessor.cs" />

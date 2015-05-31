@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiaryAPI
 {
-    public partial class DiaryAPIClient
+    public partial class DiaryAPIClient: DiaryStopWatcher
     {
         public const string DiaryAPI_URL = "http://www.diary.ru/api/";
         #region API keys
@@ -19,11 +19,14 @@ namespace DiaryAPI
             get { return timeoutBetweenRequests; }
             set { timeoutBetweenRequests = value; }
         }
-        private string _sid;
+        private string _sid = string.Empty;
         public string SID
         {
             get { return _sid; }
-            set { _sid = value; }
+            set {
+                _sid = value ?? string.Empty;
+                StartOrResetTimer();
+            }
         }
 
         private int _timeout = 5000;
@@ -53,6 +56,14 @@ namespace DiaryAPI
         {
             get { return _proxy; }
             set { _proxy = value; }
+        }
+        /// <summary>
+        /// API need re authorization after 30 minute (1800000)
+        /// </summary>
+        /// <returns></returns>
+        public bool IsSIDActive()
+        {
+            return (!string.IsNullOrEmpty(SID)) && IsActiveTimer();
         }
 
         public DiaryAPIClient()

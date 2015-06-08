@@ -87,6 +87,7 @@
     <Compile Include="DiaryAPIClientJournal.cs" />
     <Compile Include="DiaryAPIClientAuth.cs" />
     <Compile Include="DiaryAPIClientHelpers.cs" />
+    <Compile Include="DiaryAPIClientNotifications.cs" />
     <Compile Include="DiaryAPIClientPost.cs" />
     <Compile Include="DiaryAPIClientRequest.cs" />
     <Compile Include="DiaryAPIClientException.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="DiaryAPIClientMain.cs" />
     <Compile Include="JSONResponseClasses\CommentGetJSONResponse.cs" />
     <Compile Include="JSONResponseClasses\JournalGetJSONResponse.cs" />
+    <Compile Include="JSONResponseClasses\NotificationsJSONResponse.cs" />
     <Compile Include="JSONResponseClasses\PostGetJSONResponse.cs" />
     <Compile Include="JSONResponseClasses\UmailJSSONResponse.cs" />
     <Compile Include="JSONResponseClasses\UserGetJSONResponse.cs" />

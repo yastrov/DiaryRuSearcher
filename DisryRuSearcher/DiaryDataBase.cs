@@ -438,14 +438,21 @@ namespace DiaryRuSearcher
                 }
                 if(tags != null && tags.Count() > 0)
                 {
-                    var tagIdList = tags.Select(item => item.TagId);
-                    var postIdList = db.Table<TagRelationStoreModel>()
-                        .Where(item => tagIdList.Contains(item.TagId))
-                        .Select(item=>item.PostId).ToList();
-                    var q = db.Table<PostStoreModel>()
-                        .Where(item => postIdList.Contains(item.Postid))
-                        .ToList();
-                    r.Push(q);
+                    var tagIdList = tags.Select(item => item.TagId).ToList();
+                    if (tagIdList != null && tagIdList.Count() > 0)
+                    {
+                        var postIdList = db.Table<TagRelationStoreModel>()
+                            .Where(item => tagIdList.Contains(item.TagId)).ToList()
+                            .Select(item => item.PostId).ToList();
+                        if (postIdList != null && postIdList.Count() > 0)
+                        {
+                            var q = db.Table<PostStoreModel>()
+                                .Where(item => postIdList.Contains(item.Postid))
+                                .ToList();
+                            r.Push(q);
+                        }
+                    }
+                    
                 }
             }
             if (r.Count == 0)

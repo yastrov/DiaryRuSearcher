@@ -103,7 +103,7 @@ namespace DiaryRuSearcher
             }
         }
 
-        private ObservableCollection<TagViewModel> TagsCollection
+        public ObservableCollection<TagViewModel> TagsCollection
         {
             get { return _tagsCollection; }
             set
@@ -222,8 +222,8 @@ namespace DiaryRuSearcher
             this.Cursor = Cursors.Wait;
             try
             {
-                await Auth();
-                System.Windows.MessageBox.Show(diaryAPIClient.SID);
+                if(!diaryAPIClient.IsSIDActive())
+                    await Auth();
                 diaryAPIClient.TimeoutBetweenRequests = TimeoutBetweenRequests;
                 if (IsDownloadPosts)
                 {
@@ -273,6 +273,8 @@ namespace DiaryRuSearcher
                 IsImportantControlEnabled = true;
                 if (success)
                     System.Windows.MessageBox.Show("Загрузка данных завершена!", this.Title, MessageBoxButton.OK, MessageBoxImage.Information);
+                if (diaryAPIClient.IsSIDActive())
+                    diaryAPIClient.ResetTimer();
             }
         }
         private void saverButton_Click(object sender, RoutedEventArgs e)

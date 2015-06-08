@@ -138,10 +138,10 @@
                         ExpandDirection="Down"
                         IsEnabled="{Binding IsImportantControlEnabled}"
                         Grid.ColumnSpan="3" Grid.Row="3" Expanded="Expander_Expanded">
-                            <ListView ItemsSource="{Binding TagsCollection}">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Description}"
+                        <ListView ItemsSource="{Binding TagsCollection}" Height="Auto">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Description}"
                                                    HorizontalAlignment="Center"/>
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
